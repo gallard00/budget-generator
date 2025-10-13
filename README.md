@@ -104,7 +104,7 @@ Access the app at 👉 http://localhost:8080
 Nahuel Gallardo
 💻 Analyst & Software Developer
 📍 Buenos Aires, Argentina
-🔗 [GitHub](https://github.com/gallard00) • [LinkedIn](https://www.linkedin.com/in/nahuelgallard00/)
+🔗 https://github.com/gallard00 • https://www.linkedin.com/in/nahuelgallard00/
 
 🏁 License
 This project was developed for academic and learning purposes.
