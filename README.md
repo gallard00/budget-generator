@@ -38,9 +38,6 @@ com.nahuelgallardo.budgetgenerator
 ├── exception/ # Global exception handling
 └── BudgetGeneratorApplication.java
 
-pgsql
-Copiar código
-
 The project fully applies **SOLID design principles**:
 
 | Principle | Description |
@@ -69,6 +66,7 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
 
 server.port=8080
+
 🧰 Technologies
 Category	Technologies
 Language	Java 17 / 21
@@ -83,14 +81,6 @@ Exporters	iText / Apache POI (PDF, Word, Excel)
 📘 The class diagram (uml.png) representing the complete architecture is included in the repository:
 /docs/uml.png
 
-arduino
-Copiar código
-Client 1 ──── * Budget 1 ──── * Item
-                    │
-                    └── * BudgetHistory
-
-Budget ──▶ FileExporter ◀── PDFExporter / WordExporter / ExcelExporter
-Budget ──▶ BudgetRepository ◀── MariaDBBudgetRepository
 ⚙️ How to Run
 Prerequisites
 Java 17+
@@ -100,8 +90,6 @@ Maven
 MariaDB running locally
 
 Steps
-bash
-Copiar código
 # clone repository
 git clone https://github.com/gallard00/budget-generator.git
 
