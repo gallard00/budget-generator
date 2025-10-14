@@ -1,33 +1,64 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# =========================================
+# 🧠 BUDGET GENERATOR - .gitignore
+# =========================================
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# --- Build & Runtime ---
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+**/mvnw
+**/mvnw.cmd
+**/.mvn/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# --- IntelliJ IDEA ---
+.idea/
 *.iml
+*.iws
+out/
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# --- VSCode (por si abrís el proyecto ahí) ---
 .vscode/
+
+# --- OS Generated Files ---
+.DS_Store
+Thumbs.db
+
+# --- Logs & Temp ---
+logs/
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# --- Spring Boot ---
+/bin/
+/build/
+
+# --- Environment / Config ---
+.env
+*.env
+application-*.properties
+
+# --- Draw.io backups ---
+*.bkp
+*.$*.drawio.bkp
+
+# --- Node / Frontend (por si más adelante agregás un front) ---
+node_modules/
+dist/
+*.cache
+
+# --- Database dumps ---
+*.sql
+*.db
+*.sqlite
+*.dump
+
+# --- Other temporary files ---
+*.class
+*.jar
+*.war
+*.ear
+*.orig
+
