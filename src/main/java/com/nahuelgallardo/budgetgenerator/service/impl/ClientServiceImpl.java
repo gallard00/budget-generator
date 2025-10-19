@@ -33,6 +33,9 @@ public class ClientServiceImpl implements IClientService {
 
     @Override
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Client not found with id " + id);
+        }
         repository.deleteById(id);
     }
 }
