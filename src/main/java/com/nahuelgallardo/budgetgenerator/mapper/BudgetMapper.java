@@ -22,7 +22,6 @@ public class BudgetMapper {
         if (request == null) return null;
         Budget budget = Budget.builder()
                 .date(request.getDate())
-                .total(request.getTotal())
                 .client(client)
                 .build();
 

@@ -52,6 +52,13 @@ public class BudgetServiceImpl implements IBudgetService {
                 .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
 
         Budget budget = mapper.toEntity(request, client);
+
+        double total = budget.getItems().stream()
+                .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
+                .sum();
+
+        budget.setTotal(total);
+
         Budget saved = budgetRepository.save(budget);
         return mapper.toResponse(saved);
     }
@@ -65,7 +72,6 @@ public class BudgetServiceImpl implements IBudgetService {
                 .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
 
         existing.setDate(request.getDate());
-        existing.setTotal(request.getTotal());
         existing.setClient(client);
 
         existing.getItems().clear();

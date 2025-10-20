@@ -10,7 +10,6 @@ import java.util.List;
 @Setter
 public class BudgetRequest {
     private LocalDate date;
-    private Double total;
     private Long clientId;
     private List<BudgetItemRequest> items;
 }
