@@ -1,5 +1,6 @@
 package com.nahuelgallardo.budgetgenerator.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
