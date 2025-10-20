@@ -1,6 +1,7 @@
 package com.nahuelgallardo.budgetgenerator.controller;
 
-import com.nahuelgallardo.budgetgenerator.model.Client;
+import com.nahuelgallardo.budgetgenerator.dtos.request.request.ClientRequest;
+import com.nahuelgallardo.budgetgenerator.dtos.request.response.ClientResponse;
 import com.nahuelgallardo.budgetgenerator.service.IClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,40 +17,28 @@ public class ClientController {
         this.service = service;
     }
 
-    // 🔹 Obtener todos los clientes
     @GetMapping
-    public List<Client> getAll() {
+    public List<ClientResponse> getAll() {
         return service.findAll();
     }
 
-    // 🔹 Obtener cliente por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getById(@PathVariable Long id) {
+    public ResponseEntity<ClientResponse> getById(@PathVariable Long id) {
         return service.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 🔹 Crear un nuevo cliente
     @PostMapping
-    public ResponseEntity<Client> create(@RequestBody Client client) {
-        Client created = service.save(client);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<ClientResponse> create(@RequestBody ClientRequest request) {
+        return ResponseEntity.ok(service.save(request));
     }
 
-    // 🔹 Actualizar un cliente existente
     @PutMapping("/{id}")
-    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody Client updatedClient) {
-        return service.findById(id)
-                .map(existing -> {
-                    updatedClient.setId(existing.getId());
-                    Client saved = service.save(updatedClient);
-                    return ResponseEntity.ok(saved);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ClientResponse> update(@PathVariable Long id, @RequestBody ClientRequest request) {
+        return ResponseEntity.ok(service.update(id, request));
     }
 
-    // 🔹 Eliminar cliente por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
