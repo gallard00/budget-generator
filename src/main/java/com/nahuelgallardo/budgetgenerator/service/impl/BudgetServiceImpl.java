@@ -1,5 +1,8 @@
 package com.nahuelgallardo.budgetgenerator.service.impl;
 
+import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetRequest;
+import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetResponse;
+import com.nahuelgallardo.budgetgenerator.mapper.BudgetMapper;
 import com.nahuelgallardo.budgetgenerator.model.Budget;
 import com.nahuelgallardo.budgetgenerator.model.Client;
 import com.nahuelgallardo.budgetgenerator.repository.BudgetRepository;
@@ -9,49 +12,77 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BudgetServiceImpl implements IBudgetService {
     private final BudgetRepository budgetRepository;
     private final ClientRepository clientRepository;
+    private final BudgetMapper mapper;
 
-    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository) {
+    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetMapper mapper) {
         this.budgetRepository = budgetRepository;
         this.clientRepository = clientRepository;
+        this.mapper = mapper;
     }
 
     @Override
-    public List<Budget> findAll() {
-        return budgetRepository.findAll();
+    public List<BudgetResponse> findAll() {
+        return budgetRepository.findAll().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Budget> findById(Long id) {
-        return budgetRepository.findById(id);
+    public Optional<BudgetResponse> findById(Long id) {
+        return budgetRepository.findById(id)
+                .map(mapper::toResponse);
     }
 
     @Override
-    public List<Budget> findByClientId(Long clientId) {
-        return budgetRepository.findByClientId(clientId);
+    public List<BudgetResponse> findByClientId(Long clientId) {
+        return budgetRepository.findByClientId(clientId).stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Budget save(Budget budget) {
-        // Si el cliente viene solo con el id, lo cargamos desde la BD
-        if (budget.getClient() != null && budget.getClient().getId() != null) {
-            Client client = clientRepository.findById(budget.getClient().getId())
-                    .orElseThrow(() -> new RuntimeException("Client not found with id " + budget.getClient().getId()));
-            budget.setClient(client);
+    public BudgetResponse save(BudgetRequest request) {
+        Client client = clientRepository.findById(request.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
+
+        Budget budget = mapper.toEntity(request, client);
+        Budget saved = budgetRepository.save(budget);
+        return mapper.toResponse(saved);
+    }
+
+    @Override
+    public BudgetResponse update(Long id, BudgetRequest request) {
+        Budget existing = budgetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Budget not found with id " + id));
+
+        Client client = clientRepository.findById(request.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
+
+        existing.setDate(request.getDate());
+        existing.setTotal(request.getTotal());
+        existing.setClient(client);
+
+        existing.getItems().clear();
+        if (request.getItems() != null) {
+            request.getItems().forEach(itemReq -> {
+                var item = mapper.toEntity(request, client).getItems().get(0);
+                item.setBudget(existing);
+                existing.getItems().add(item);
+            });
         }
 
-        return budgetRepository.save(budget);
+        Budget updated = budgetRepository.save(existing);
+        return mapper.toResponse(updated);
     }
 
     @Override
     public void delete(Long id) {
-        if (!budgetRepository.existsById(id)) {
-            throw new RuntimeException("Budget not found with id " + id);
-        }
         budgetRepository.deleteById(id);
     }
 }
