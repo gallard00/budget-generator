@@ -1,0 +1,33 @@
+<div class="card p-4 shadow-sm">
+  <h4>Clients</h4>
+
+  <form class="row g-2 mb-3" (ngSubmit)="createClient()">
+    <div class="col-md-4">
+      <input [(ngModel)]="newClient.name" name="name" placeholder="Name" class="form-control" />
+    </div>
+    <div class="col-md-4">
+      <input [(ngModel)]="newClient.phone" name="phone" placeholder="Phone" class="form-control" />
+    </div>
+    <div class="col-md-4">
+      <input [(ngModel)]="newClient.address" name="address" placeholder="Address" class="form-control" />
+    </div>
+    <div class="col-12 mt-2">
+      <button class="btn btn-primary w-100">Add Client</button>
+    </div>
+  </form>
+
+  <table class="table table-striped mt-3">
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Phone</th><th>Address</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of clients">
+        <td>{{ c.id }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.address }}</td>
+        <td><button class="btn btn-sm btn-danger" (click)="deleteClient(c.id)">🗑️</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
