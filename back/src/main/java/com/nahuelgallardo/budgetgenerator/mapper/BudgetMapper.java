@@ -42,7 +42,7 @@ public class BudgetMapper {
         response.setId(entity.getId());
         response.setDate(entity.getDate());
         response.setTotal(entity.getTotal());
-        response.setClientName(entity.getClient() != null ? entity.getClient().getName() : null);
+        response.setClient(entity.getClient() != null ? entity.getClient().getName() : null);
 
         if (entity.getItems() != null) {
             response.setItems(entity.getItems().stream()

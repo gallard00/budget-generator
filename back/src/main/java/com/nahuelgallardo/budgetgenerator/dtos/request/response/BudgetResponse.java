@@ -12,6 +12,6 @@ public class BudgetResponse {
     private Long id;
     private LocalDate date;
     private Double total;
-    private String clientName;
+    private String client;
     private List<BudgetItemResponse> items;
 }

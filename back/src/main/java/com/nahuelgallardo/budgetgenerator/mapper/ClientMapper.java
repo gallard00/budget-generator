@@ -20,6 +20,7 @@ public class ClientMapper {
     public ClientResponse toResponse(Client entity) {
         if (entity == null) return null;
         ClientResponse response = new ClientResponse();
+        response.setId(entity.getId());
         response.setName(entity.getName());
         response.setPhone(entity.getPhone());
         response.setAddress(entity.getAddress());
