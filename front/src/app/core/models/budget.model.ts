@@ -5,5 +5,6 @@ export interface Budget {
   date: string;
   total?: number;
   clientId: number;
+  client?: string;
   items: BudgetItem[];
 }

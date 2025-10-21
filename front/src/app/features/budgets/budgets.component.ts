@@ -5,11 +5,12 @@ import { BudgetService } from '../../core/services/budget.service';
 import { ClientService } from '../../core/services/client.service';
 import { Budget } from '../../core/models/budget.model';
 import { Client } from '../../core/models/client.model';
+import { SafeUrlPipe } from '../../shared/components/pipes/safe-url.pipe';
 
 @Component({
   selector: 'app-budgets',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SafeUrlPipe],
   templateUrl: './budgets.component.html',
   styleUrls: ['./budgets.component.scss']
 })
@@ -20,6 +21,10 @@ export class BudgetsComponent implements OnInit {
 
   newItem = { description: '', quantity: 1, unitPrice: 0 };
 
+  // ✅ Variables para el modal PDF
+  pdfUrl: string | null = null;
+  isLoadingPdf = false;
+
   async ngOnInit() {
     await this.loadClients();
     await this.loadBudgets();
@@ -28,6 +33,8 @@ export class BudgetsComponent implements OnInit {
   async loadBudgets() {
     this.budgets = await BudgetService.getAll();
   }
+
+  
 
   async loadClients() {
     this.clients = await ClientService.getAll();
@@ -57,5 +64,34 @@ export class BudgetsComponent implements OnInit {
     console.error('Error creating budget:', err);
     alert('❌ Error creating budget.');
   }
+  }
+
+  // ✅ Abre el modal con el PDF
+  async openPdfModal(budgetId: number) {
+    this.isLoadingPdf = true;
+    this.pdfUrl = null;
+
+    try {
+      const blob = await BudgetService.exportPdf(budgetId);
+      this.pdfUrl = window.URL.createObjectURL(blob);
+    } catch (err) {
+      console.error('Error loading PDF:', err);
+      alert('❌ Error loading PDF.');
+    } finally {
+      this.isLoadingPdf = false;
+      const modal = document.getElementById('pdfModal');
+      if (modal) {
+        const modalInstance = new (window as any).bootstrap.Modal(modal);
+        modalInstance.show();
+      }
+    }
+  }
+
+  // ✅ Cierra el modal y libera memoria
+  closePdfModal() {
+    if (this.pdfUrl) {
+      window.URL.revokeObjectURL(this.pdfUrl);
+      this.pdfUrl = null;
+    }
   }
 }
