@@ -1,0 +1,17 @@
+a.active {
+  color: white !important;
+  font-weight: bold;
+}
+
+.btn-outline-primary.active {
+  background-color: #0d6efd;
+}
+
+.btn-outline-success.active {
+  background-color: #198754;
+}
+
+.btn-outline-warning.active {
+  background-color: #ffc107;
+  color: black !important;
+}
