@@ -6,106 +6,195 @@
 ![MariaDB](https://img.shields.io/badge/MariaDB-Database-lightblue?logo=mariadb)
 ![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
----
+Budget Generator es una aplicación Full Stack (Spring Boot + Angular 20) diseñada para la gestión y creación de presupuestos de manera dinámica y profesional.
+Permite registrar clientes, crear presupuestos con ítems detallados, generar archivos PDF, y realizar cálculos de materiales según superficie y tipo de trabajo.
 
-### 🧮 **About the project**
+🧩 Tecnologías utilizadas
+🖥️ Backend
 
-**Budget Generator** is a backend application developed with **Spring Boot** to create, manage, and export professional **budgets**.  
-It was created as the **final project** for the **EDI3 – Advanced Object-Oriented Programming** course, applying **SOLID principles**, **layered architecture**, and **relational persistence** with **MariaDB**.
+Java 17
 
----
+Spring Boot 3.x
 
-## 🚀 **Features**
+Spring Data JPA
 
-✅ Create, edit, and delete budgets  
-✅ Manage clients and items  
-✅ Automatically calculate totals and subtotals  
-✅ Export budgets in multiple file formats:
-- 📄 **PDF** (for printing or sending)
-- 📝 **Word (.docx)** (editable version)
-- 📊 **Excel (.xlsx)** (for calculations and analysis)
+MariaDB
 
----
+Lombok
 
-## 🧩 **Architecture Overview**
+ModelMapper
 
-com.nahuelgallardo.budgetgenerator
-├── model/ # Entities (Client, Budget, Item, BudgetHistory)
-├── repository/ # Repository interfaces + MariaDB implementation
-├── service/ # Business logic layer
-├── controller/ # REST controllers
-├── exporter/ # File exporters (PDF, Word, Excel)
-├── exception/ # Global exception handling
+Springdoc OpenAPI / Swagger UI
+
+ReportLab (para exportación PDF)
+
+Docker Compose
+
+🌐 Frontend
+
+Angular 20.3.4 (standalone components)
+
+Bootstrap 5
+
+Axios
+
+RxJS
+
+TypeScript
+
+HTML / SCSS
+
+⚙️ Arquitectura
+
+El sistema se organiza bajo una arquitectura en capas:
+
+back/
+├── controller/
+│   └── BudgetController.java
+│   └── ClientController.java
+│   └── CalculationController.java
+├── model/
+│   ├── Budget.java
+│   ├── Client.java
+│   ├── Item.java
+│   ├── CalculationInput.java
+│   ├── CalculationResult.java
+│   ├── MaterialType.java
+├── repository/
+│   └── BudgetRepository.java
+│   └── ClientRepository.java
+├── service/
+│   ├── ICalculationService.java
+│   ├── impl/
+│   │   └── CalculationServiceImpl.java
+├── strategy/
+│   ├── IFileExporter.java
+│   ├── PDFExporter.java
+│   ├── WordExporter.java
 └── BudgetGeneratorApplication.java
 
-The project fully applies **SOLID design principles**:
+front/
+├── core/
+│   ├── models/
+│   ├── services/
+│   └── pipes/
+├── features/
+│   ├── clients/
+│   ├── budgets/
+│   └── calculator/
+└── app.routes.ts
 
-| Principle | Description |
-|------------|--------------|
-| **S** – Single Responsibility | Each class has one clear purpose |
-| **O** – Open/Closed | New exporters can be added without modifying core code |
-| **L** – Liskov Substitution | Exporters can substitute each other freely |
-| **I** – Interface Segregation | Small, focused interfaces (`BudgetRepository`, `FileExporter`) |
-| **D** – Dependency Inversion | Services depend on abstractions, not implementations |
+🧮 Módulos principales
+👤 Gestión de Clientes
 
----
+Alta, baja y modificación de clientes.
 
-## 🗄️ **Database Configuration**
+Eliminación en cascada: si se elimina un cliente, se eliminan sus presupuestos.
 
-**MariaDB** is used for relational persistence.
+🧾 Gestión de Presupuestos
 
-`src/main/resources/application.properties`
-```properties
-spring.datasource.url=jdbc:mariadb://localhost:3306/budget_db
-spring.datasource.username=root
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+Creación de presupuestos con fecha, cliente e ítems.
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
+Cada ítem contiene descripción, cantidad y precio unitario.
 
-server.port=8080
+Cálculo automático del total.
 
-🧰 Technologies
-Category	Technologies
-Language	Java 17 / 21
-Framework	Spring Boot 3.3.x
-Database	MariaDB
-ORM	Spring Data JPA
-Utilities	Lombok, Spring DevTools
-Build Tool	Maven
-Exporters	iText / Apache POI (PDF, Word, Excel)
+Exportación en PDF.
 
-🧾 UML Diagram
-📘 The class diagram (uml.png) representing the complete architecture is included in the repository:
-/docs/uml.png
+🧱 Calculadora de Materiales
 
-⚙️ How to Run
-Prerequisites
-Java 17+
+Permite calcular superficie (m²) multiplicando ancho × alto.
 
-Maven
+Según el tipo de material (Porcelanato, Mármol, Revoque, etc.) calcula el costo total.
 
-MariaDB running locally
+Los resultados pueden agregarse directamente al presupuesto activo.
 
-Steps
-# clone repository
-git clone https://github.com/gallard00/budget-generator.git
+🧠 Patrones y Principios aplicados
+Patrón / Principio	Implementación
+SOLID	Separación de responsabilidades (Service, Repository, Mapper, DTO).
+Repository Pattern	IBudgetRepository / MariaDBBudgetRepository.
+Strategy Pattern	IFileExporter con implementaciones PDFExporter, WordExporter.
+Dependency Inversion	Budget depende de abstracciones (interfaces), no implementaciones concretas.
+DTO Layer	Transferencia de datos entre API y frontend.
+Exception Handling Global	GlobalExceptionHandler.
+Observable Data Sharing	SharedDataService entre componentes Angular.
+📊 Diagrama UML (actualizado)
+Relación	Descripción
+Client ●───1───* Budget	Composición: al borrar un cliente, se eliminan sus presupuestos.
+Budget ◇───1───* Item	Composición: los ítems pertenecen al presupuesto.
+Budget → IFileExporter	Usa una estrategia para exportar (PDF/Word).
+Budget → IBudgetRepository	Usa un repositorio para persistencia.
+Calculator → SharedDataService → Budgets	Comunicación entre módulos del frontend.
+🧰 Ejecución del proyecto
+🐳 Con Docker Compose
+docker-compose up --build
 
-# navigate into project
-cd budget-generator
 
-# build and run
+Esto levanta:
+
+Backend Spring Boot en http://localhost:8080
+
+Base de datos MariaDB
+
+Frontend Angular (servidor de desarrollo)
+
+⚙️ Manual (sin Docker)
+Backend
+cd back
 mvn spring-boot:run
-Access the app at 👉 http://localhost:8080
 
-👤 Author
-Nahuel Gallardo
-💻 Analyst & Software Developer
-📍 Buenos Aires, Argentina
-🔗 https://github.com/gallard00 • https://www.linkedin.com/in/nahuelgallard00/
+Frontend
+cd front
+npm install
+ng serve --open
 
-🏁 License
-This project was developed for academic and learning purposes.
-You may freely use and modify it for educational use.
+
+App: http://localhost:4200
+
+📦 API Endpoints principales
+Método	Endpoint	Descripción
+GET	/api/clients	Lista todos los clientes.
+POST	/api/clients	Crea un nuevo cliente.
+DELETE	/api/clients/{id}	Elimina un cliente.
+GET	/api/budgets	Obtiene todos los presupuestos.
+POST	/api/budgets	Crea un presupuesto nuevo.
+GET	/api/export/pdf/{id}	Exporta presupuesto a PDF.
+POST	/api/calc	Calcula superficie y costo según material.
+📁 Ejemplo de presupuesto (JSON)
+{
+  "clientId": 3,
+  "date": "2025-10-21",
+  "items": [
+    { "description": "Porcelanato (10.5 m²)", "quantity": 10.5, "unitPrice": 8000 },
+    { "description": "Revoque (5.2 m²)", "quantity": 5.2, "unitPrice": 5000 }
+  ]
+}
+
+🧱 Ejemplo de cálculo desde el módulo Calculator
+{
+  "width": 5.2,
+  "height": 2.0,
+  "materialType": "PORCELANATO"
+}
+
+
+Resultado:
+
+{
+  "squareMeters": 10.4,
+  "totalPrice": 83200
+}
+
+🧠 Autor
+
+👨‍💻 Nahuel Gallardo
+Analista en Programación y Desarrollo de Aplicaciones
+📍 Miramar, Buenos Aires, Argentina
+🔗 LinkedIn
+
+🐙 GitHub
+
+⭐ Contribución
+
+Las contribuciones son bienvenidas.
+Si querés proponer mejoras, abrí un issue o hacé un pull request con una descripción clara de los cambios.
