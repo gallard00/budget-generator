@@ -54,3 +54,161 @@
 
 ## 🧠 Arquitectura
 
+back/
+├── controller/
+│ ├── BudgetController.java
+│ ├── ClientController.java
+│ └── CalculationController.java
+├── model/
+│ ├── Budget.java
+│ ├── Client.java
+│ ├── Item.java
+│ ├── CalculationInput.java
+│ ├── CalculationResult.java
+│ └── MaterialType.java
+├── repository/
+│ ├── BudgetRepository.java
+│ └── ClientRepository.java
+├── service/
+│ ├── ICalculationService.java
+│ └── impl/CalculationServiceImpl.java
+├── strategy/
+│ ├── IFileExporter.java
+│ ├── PDFExporter.java
+│ └── WordExporter.java
+└── BudgetGeneratorApplication.java
+
+front/
+├── core/
+│ ├── models/
+│ ├── services/
+│ └── pipes/
+├── features/
+│ ├── clients/
+│ ├── budgets/
+│ └── calculator/
+└── app.routes.ts
+
+yaml
+Copiar código
+
+---
+
+## 🧾 Módulos principales
+
+### 👤 Clientes
+- Crear, listar y eliminar clientes.
+- Relación 1:N con presupuestos.
+- Eliminación en cascada.
+
+### 💰 Presupuestos
+- Crear presupuestos con fecha, cliente e ítems.
+- Calcular el total automáticamente.
+- Exportar presupuesto en formato **PDF**.
+
+### 🧮 Calculadora de materiales
+- Calcular superficie (ancho × alto).
+- Seleccionar tipo de material y calcular costo total.
+- Enviar los ítems calculados directamente al presupuesto activo.
+
+---
+
+## 🧱 Patrones y principios aplicados
+
+| Patrón / Principio | Implementación |
+|--------------------|----------------|
+| **SOLID** | Separación en capas: Controller, Service, Repository, DTO. |
+| **Repository Pattern** | `IBudgetRepository` / `MariaDBBudgetRepository`. |
+| **Strategy Pattern** | `IFileExporter` con implementaciones `PDFExporter` y `WordExporter`. |
+| **Dependency Inversion** | `Budget` depende de abstracciones. |
+| **DTO Layer** | Comunicación limpia entre API y Frontend. |
+| **Observable Sharing** | `SharedDataService` entre componentes Angular. |
+
+---
+
+## 📊 Diagrama UML (simplificado)
+
+Client 1 ────◆───* Budget ◇───* Item
+Budget ──> IFileExporter ──> PDFExporter | WordExporter
+Budget ──> IBudgetRepository ──> MariaDBBudgetRepository
+Calculator ──> SharedDataService ──> Budgets
+
+yaml
+Copiar código
+
+---
+
+## 🐳 Ejecución con Docker
+
+```bash
+docker-compose up --build
+Esto levanta:
+
+Backend Spring Boot en http://localhost:8080
+
+Base de datos MariaDB
+
+Frontend Angular en http://localhost:4200
+
+⚙️ Ejecución manual
+Backend
+bash
+Copiar código
+cd back
+mvn spring-boot:run
+Frontend
+bash
+Copiar código
+cd front
+npm install
+ng serve --open
+📡 API Endpoints
+Método	Endpoint	Descripción
+GET	/api/clients	Listar clientes
+POST	/api/clients	Crear cliente
+DELETE	/api/clients/{id}	Eliminar cliente
+GET	/api/budgets	Listar presupuestos
+POST	/api/budgets	Crear presupuesto
+GET	/api/export/pdf/{id}	Exportar presupuesto a PDF
+POST	/api/calc	Calcular materiales
+
+🧩 Ejemplo de presupuesto
+json
+Copiar código
+{
+  "clientId": 1,
+  "date": "2025-10-21",
+  "items": [
+    { "description": "Porcelanato (10.5 m²)", "quantity": 10.5, "unitPrice": 8000 },
+    { "description": "Revoque (5.2 m²)", "quantity": 5.2, "unitPrice": 5000 }
+  ]
+}
+🧮 Ejemplo de cálculo (módulo Calculator)
+json
+Copiar código
+{
+  "width": 5.2,
+  "height": 2.0,
+  "materialType": "PORCELANATO"
+}
+Respuesta:
+
+json
+Copiar código
+{
+  "squareMeters": 10.4,
+  "totalPrice": 83200
+}
+👨‍💻 Autor
+Nahuel Gallardo
+Analista en Programación y Desarrollo de Aplicaciones
+📍 Miramar, Buenos Aires, Argentina
+📧 gallardonahuel293@gmail.com
+🔗 LinkedIn
+🐙 GitHub
+
+⭐ Contribución
+Si querés proponer mejoras o reportar bugs, abrí un Issue o hacé un Pull Request.
+¡Las sugerencias son siempre bienvenidas!
+
+Desarrollado con ❤️ por Nahuel Gallardo — Proyecto académico y profesional.
