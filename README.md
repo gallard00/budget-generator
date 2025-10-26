@@ -142,28 +142,35 @@ Copiar código
 
 ```bash
 docker-compose up --build
+```
 Esto levanta:
 
-Backend Spring Boot en http://localhost:8080
+-Backend Spring Boot en http://localhost:8080
 
-Base de datos MariaDB
+-Base de datos MariaDB
 
-Frontend Angular en http://localhost:4200
+-Frontend Angular en http://localhost:4200
 
-⚙️ Ejecución manual
-Backend
+---
+
+## ⚙️ Ejecución manual
+**Backend**
+```
 bash
-Copiar código
 cd back
 mvn spring-boot:run
-Frontend
+```
+**Frontend**
+```
 bash
-Copiar código
 cd front
 npm install
 ng serve --open
-📡 API Endpoints
-Método	Endpoint	Descripción
+```
+---
+
+## 📡 API Endpoints
+**Método**	**Endpoint**	**Descripción**
 GET	/api/clients	Listar clientes
 POST	/api/clients	Crear cliente
 DELETE	/api/clients/{id}	Eliminar cliente
@@ -172,9 +179,11 @@ POST	/api/budgets	Crear presupuesto
 GET	/api/export/pdf/{id}	Exportar presupuesto a PDF
 POST	/api/calc	Calcular materiales
 
-🧩 Ejemplo de presupuesto
+---
+
+## 🧩 Ejemplo de presupuesto
+```
 json
-Copiar código
 {
   "clientId": 1,
   "date": "2025-10-21",
@@ -183,29 +192,39 @@ Copiar código
     { "description": "Revoque (5.2 m²)", "quantity": 5.2, "unitPrice": 5000 }
   ]
 }
-🧮 Ejemplo de cálculo (módulo Calculator)
+
+```
+
+---
+
+## 🧮 Ejemplo de cálculo (módulo Calculator)
+```
 json
-Copiar código
 {
   "width": 5.2,
   "height": 2.0,
   "materialType": "PORCELANATO"
 }
-Respuesta:
-
+```
+**Respuesta:**
+```
 json
-Copiar código
 {
   "squareMeters": 10.4,
   "totalPrice": 83200
 }
-👨‍💻 Autor
-Nahuel Gallardo
+```
+---
+
+## 👨‍💻 Autor
+**Nahuel Gallardo**
 Analista en Programación y Desarrollo de Aplicaciones
 📍 Miramar, Buenos Aires, Argentina
 📧 gallardonahuel293@gmail.com
-🔗 LinkedIn
-🐙 GitHub
+🔗 [LinkedIn](https://www.linkedin.com/in/nahuelgallard00/)
+🐙 [GitHub](https://github.com/gallard00)
+
+---
 
 ⭐ Contribución
 Si querés proponer mejoras o reportar bugs, abrí un Issue o hacé un Pull Request.
