@@ -1,21 +1,21 @@
-// ✅ Importaciones principales de Angular
+// Importaciones principales de Angular
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-// ✅ Importación de servicios que gestionan la lógica de negocio
+// Importación de servicios que gestionan la lógica de negocio
 import { BudgetService } from '../../core/services/budget.service';
 import { ClientService } from '../../core/services/client.service';
 
-// ✅ Modelos de datos
+// Modelos de datos
 import { Budget } from '../../core/models/budget.model';
 import { Client } from '../../core/models/client.model';
 import { BudgetItem } from '../../core/models/budget-item.model';
 
-// ✅ Pipe personalizado para mostrar PDF de forma segura en iframe
+// Pipe personalizado para mostrar PDF de forma segura en iframe
 import { SafeUrlPipe } from '../../shared/components/pipes/safe-url.pipe';
 
-// ✅ Servicio para compartir ítems entre Calculator → Budgets
+// Servicio para compartir ítems entre Calculator → Budgets
 import { SharedDataService } from '../../core/services/shared-data.service';
 
 @Component({
@@ -26,31 +26,31 @@ import { SharedDataService } from '../../core/services/shared-data.service';
   styleUrls: ['./budgets.component.scss']            // Estilos CSS específicos
 })
 export class BudgetsComponent implements OnInit, AfterViewInit {
-  // 📊 Lista de presupuestos existentes (traídos del backend)
+  // Lista de presupuestos existentes (traídos del backend)
   budgets: Budget[] = [];
 
-  // 👤 Lista de clientes disponibles (traídos del backend)
+  // Lista de clientes disponibles (traídos del backend)
   clients: Client[] = [];
 
-  // 🧾 Modelo del nuevo presupuesto que se está creando
+  // Modelo del nuevo presupuesto que se está creando
   newBudget: Budget = {
     clientId: 0,                                         // Cliente seleccionado
     date: new Date().toISOString().split('T')[0],        // Fecha actual por defecto (formato yyyy-MM-dd)
     items: []                                            // Lista vacía de ítems
   };
 
-  // 🧩 Ítem temporal que se está cargando manualmente
+  // Ítem temporal que se está cargando manualmente
   newItem = { description: '', quantity: 1, unitPrice: 0 };
 
-  // 📄 Variables para manejo del PDF
+  // Variables para manejo del PDF
   pdfUrl: string | null = null;   // URL del PDF generado
   isLoadingPdf = false;           // Bandera para mostrar spinner durante la carga
 
-  // ✅ Inyección del servicio compartido (para comunicación entre componentes)
+  // Inyección del servicio compartido (para comunicación entre componentes)
   constructor(private sharedData: SharedDataService) {}
 
   /**
-   * 🟢 Método del ciclo de vida: se ejecuta cuando el componente se inicializa.
+   * Método del ciclo de vida: se ejecuta cuando el componente se inicializa.
    * 
    * 1. Carga los clientes y presupuestos del backend.
    * 2. Recupera ítems almacenados en `SharedDataService` (desde Calculator).
@@ -60,7 +60,7 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
     await this.loadClients();
     await this.loadBudgets();
 
-    // 🧩 1. Cargar todos los ítems guardados en sessionStorage
+    // 1. Cargar todos los ítems guardados en sessionStorage
     const savedItems = this.sharedData.getItems();
     if (savedItems.length > 0) {
       console.log('🟢 Cargando múltiples ítems desde sessionStorage:', savedItems);
@@ -70,7 +70,7 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
       this.sharedData.clear();
     }
 
-    // 🧩 2. Suscripción a actualizaciones en tiempo real del SharedDataService
+    // 2. Suscripción a actualizaciones en tiempo real del SharedDataService
     this.sharedData.items$.subscribe((items: BudgetItem[]) => {
       if (items.length > 0) {
         console.log('📩 Recibidos en tiempo real:', items);
@@ -81,7 +81,7 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * 🧠 AfterViewInit:
+   * AfterViewInit:
    * 
    * Se ejecuta después de que la vista fue renderizada.
    * Vuelve a cargar clientes y presupuestos del backend,
@@ -91,26 +91,26 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
     await this.loadClients();
     await this.loadBudgets();
 
-    // 🔹 Pequeño retraso antes de limpiar (para evitar eliminar ítems antes de ser mostrados)
+    //  Pequeño retraso antes de limpiar (para evitar eliminar ítems antes de ser mostrados)
     setTimeout(() => this.sharedData.clear(), 300);
   }
 
   /**
-   * 🔄 Llama al backend para obtener todos los presupuestos existentes.
+   * Llama al backend para obtener todos los presupuestos existentes.
    */
   async loadBudgets() {
     this.budgets = await BudgetService.getAll();
   }
 
   /**
-   * 👥 Llama al backend para obtener todos los clientes registrados.
+   * Llama al backend para obtener todos los clientes registrados.
    */
   async loadClients() {
     this.clients = await ClientService.getAll();
   }
 
   /**
-   * ➕ Agrega un ítem manualmente al nuevo presupuesto.
+   * Agrega un ítem manualmente al nuevo presupuesto.
    * 
    * - Clona el objeto `newItem` (para evitar referencias).
    * - Lo agrega a `newBudget.items`.
@@ -122,14 +122,14 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * 🗑️ Elimina un ítem del presupuesto actual según su índice.
+   * Elimina un ítem del presupuesto actual según su índice.
    */
   removeItem(i: number) {
     this.newBudget.items.splice(i, 1);
   }
 
   /**
-   * 💾 Envía el presupuesto actual al backend.
+   * Envía el presupuesto actual al backend.
    * 
    * - Verifica que haya un cliente y al menos un ítem cargado.
    * - Si todo está correcto, realiza una petición POST.
@@ -161,7 +161,7 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * 📄 Genera y abre el PDF de un presupuesto específico.
+   * Genera y abre el PDF de un presupuesto específico.
    * 
    * - Llama al método `exportPdf()` del servicio.
    * - Este método abre una nueva pestaña con el PDF generado en el backend.
@@ -176,7 +176,7 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * ❎ Cierra el modal del PDF y libera la URL creada con `createObjectURL`.
+   * Cierra el modal del PDF y libera la URL creada con `createObjectURL`.
    * 
    * Esto evita pérdidas de memoria al eliminar blobs temporales.
    */

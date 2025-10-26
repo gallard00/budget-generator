@@ -1,13 +1,13 @@
-// ✅ Importamos Axios, la librería que usamos para realizar peticiones HTTP al backend.
+// Importamos Axios, la librería que usamos para realizar peticiones HTTP al backend.
 import axios from 'axios';
 
-// ✅ Importamos los modelos que definen los datos de entrada y salida del cálculo.
+// Importamos los modelos que definen los datos de entrada y salida del cálculo.
 // Esto nos permite tener tipado fuerte (TypeScript) en todo el flujo de datos.
 import { CalculationInput } from '../models/calculation-input.model';
 import { CalculationResult } from '../models/calculation-result.model';
 
 /**
- * 🌐 URL base del endpoint para el módulo de cálculos.
+ * URL base del endpoint para el módulo de cálculos.
  * 
  * Este endpoint (`/api/calc`) es manejado por el backend (CalculationController),
  * que aplica el patrón Strategy para calcular costos según el tipo de material.
@@ -15,7 +15,7 @@ import { CalculationResult } from '../models/calculation-result.model';
 const API_URL = 'http://localhost:8080/api/calc';
 
 /**
- * 🧮 Servicio de Cálculos
+ * Servicio de Cálculos
  * 
  * Este servicio envía al backend los datos del cálculo (ancho, alto, tipo de material)
  * y recibe el resultado: metros cuadrados totales y precio final.
@@ -25,7 +25,7 @@ const API_URL = 'http://localhost:8080/api/calc';
  */
 export const CalculationService = {
   /**
-   * 📤 Envía los datos del cálculo al backend y obtiene el resultado.
+   * Envía los datos del cálculo al backend y obtiene el resultado.
    * 
    * @param data - Objeto que contiene:
    *   - `width`: ancho en metros
@@ -36,7 +36,7 @@ export const CalculationService = {
    *   - `squareMeters`: superficie total
    *   - `totalPrice`: costo total (superficie × precio del material)
    * 
-   * 🔹 Usa `axios.post` con tipado genérico `<CalculationResult>` para garantizar
+   * Usa `axios.post` con tipado genérico `<CalculationResult>` para garantizar
    * que la respuesta coincida con la estructura esperada del modelo.
    */
   calculate: async (data: CalculationInput): Promise<CalculationResult> => {

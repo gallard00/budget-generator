@@ -1,11 +1,11 @@
-// ✅ Importamos Axios, la librería utilizada para realizar solicitudes HTTP.
+// Importamos Axios, la librería utilizada para realizar solicitudes HTTP.
 import axios from 'axios';
 
-// ✅ Importamos el modelo `Client` para tipar correctamente las respuestas del backend.
+// Importamos el modelo `Client` para tipar correctamente las respuestas del backend.
 import { Client } from '../models/client.model';
 
 /**
- * 🌐 URL base del endpoint de clientes.
+ * URL base del endpoint de clientes.
  * 
  * Este endpoint (`/api/clients`) es manejado por el backend y permite
  * realizar operaciones CRUD sobre la entidad `Client`.
@@ -13,7 +13,7 @@ import { Client } from '../models/client.model';
 const API_URL = 'http://localhost:8080/api/clients';
 
 /**
- * 👤 Servicio de Clientes
+ * Servicio de Clientes
  * 
  * Este servicio encapsula todas las llamadas al backend relacionadas con
  * la entidad `Client`.  
@@ -22,7 +22,7 @@ const API_URL = 'http://localhost:8080/api/clients';
  */
 export const ClientService = {
   /**
-   * 📥 Obtiene todos los clientes registrados en el sistema.
+   * Obtiene todos los clientes registrados en el sistema.
    * 
    * - Realiza una solicitud GET al endpoint `/api/clients`.
    * - Tipamos la respuesta como `Client[]` para garantizar consistencia con el modelo.
@@ -31,7 +31,7 @@ export const ClientService = {
   getAll: async () => (await axios.get<Client[]>(API_URL)).data,
 
   /**
-   * 📝 Crea un nuevo cliente en la base de datos.
+   * Crea un nuevo cliente en la base de datos.
    * 
    * @param data - Objeto `Client` con los datos del cliente a crear.
    * 
@@ -41,7 +41,7 @@ export const ClientService = {
   create: async (data: Client) => (await axios.post<Client>(API_URL, data)).data,
 
   /**
-   * 🗑️ Elimina un cliente según su ID.
+   * Elimina un cliente según su ID.
    * 
    * @param id - Identificador numérico del cliente a eliminar.
    * 

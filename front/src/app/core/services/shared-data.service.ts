@@ -1,14 +1,14 @@
-// ✅ Importamos los decoradores e interfaces necesarios de Angular
+// Importamos los decoradores e interfaces necesarios de Angular
 import { Injectable } from '@angular/core';
 
-// ✅ Importamos `BehaviorSubject` de RxJS, que nos permite manejar un estado reactivo y subscribible.
+// Importamos `BehaviorSubject` de RxJS, que nos permite manejar un estado reactivo y subscribible.
 import { BehaviorSubject } from 'rxjs';
 
-// ✅ Importamos el modelo `BudgetItem` para tipar correctamente los datos que se comparten.
+// Importamos el modelo `BudgetItem` para tipar correctamente los datos que se comparten.
 import { BudgetItem } from '../models/budget-item.model';
 
 /**
- * 💾 Servicio de Datos Compartidos (SharedDataService)
+ * Servicio de Datos Compartidos (SharedDataService)
  * 
  * Este servicio permite **compartir información entre componentes** sin necesidad
  * de pasar datos por `@Input()` o `@Output()`.  
@@ -17,12 +17,12 @@ import { BudgetItem } from '../models/budget-item.model';
  * agregados en memoria (y en `sessionStorage` para persistencia temporal).
  */
 @Injectable({
-  providedIn: 'root' // 👉 Esto hace que el servicio sea singleton y accesible en toda la app.
+  providedIn: 'root' // Esto hace que el servicio sea singleton y accesible en toda la app.
 })
 export class SharedDataService {
 
   /**
-   * 🧠 `BehaviorSubject` es una fuente de datos reactiva que mantiene el último valor emitido.
+   * `BehaviorSubject` es una fuente de datos reactiva que mantiene el último valor emitido.
    * 
    * - `BudgetItem[]` → tipo de datos que guarda (lista de ítems de presupuesto)
    * - `[]` → valor inicial vacío
@@ -30,14 +30,14 @@ export class SharedDataService {
   private itemsSource = new BehaviorSubject<BudgetItem[]>([]);
 
   /**
-   * 📡 Observable que los componentes pueden suscribirse para reaccionar a cambios.
+   * Observable que los componentes pueden suscribirse para reaccionar a cambios.
    * 
    * Ejemplo: en `BudgetsComponent`, nos suscribimos a `items$` para detectar nuevos ítems.
    */
   items$ = this.itemsSource.asObservable();
 
   /**
-   * ➕ Agrega un nuevo ítem al estado compartido.
+   * Agrega un nuevo ítem al estado compartido.
    * 
    * - Recupera la lista actual de ítems.
    * - Crea una nueva lista (`spread operator` para no mutar el array original).
@@ -56,7 +56,7 @@ export class SharedDataService {
   }
 
   /**
-   * 📦 Recupera todos los ítems guardados.
+   * Recupera todos los ítems guardados.
    * 
    * - Primero intenta leer `sessionStorage` (para mantener estado al recargar o cambiar ruta).
    * - Si no hay datos guardados, devuelve un array vacío.
@@ -72,7 +72,7 @@ export class SharedDataService {
   }
 
   /**
-   * 🧹 Limpia todos los ítems tanto en memoria como en el almacenamiento temporal.
+   * Limpia todos los ítems tanto en memoria como en el almacenamiento temporal.
    * 
    * - Vacía el `BehaviorSubject`.
    * - Elimina el registro de `sessionStorage`.
@@ -84,7 +84,7 @@ export class SharedDataService {
   }
 
   /**
-   * 🗑️ Elimina un ítem de la lista por su índice.
+   * Elimina un ítem de la lista por su índice.
    * 
    * - Carga los ítems actuales.
    * - Remueve el elemento con `splice`.
