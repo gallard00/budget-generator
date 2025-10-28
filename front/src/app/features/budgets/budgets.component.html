@@ -55,37 +55,43 @@
     </thead>
     <tbody>
       <tr *ngFor="let b of budgets">
-        <td>{{ b.id }}</td>
-        <td>{{ b.date }}</td>
-        <td>{{ b.total | currency:'ARS' }}</td>
-        <td>{{ b.client }}</td>
-        <td>
-          <button class="btn btn-outline-primary btn-sm" (click)="openPdfModal(b.id!)">
-            📄 View PDF
-          </button>
-        </td>
+
+        <!-- Modo edición -->
+        <ng-container *ngIf="editId === b.id; else viewRow">
+          <td>{{ b.id }}</td>
+          <td><input [(ngModel)]="editModel.date" name="e_date_{{b.id}}" type="date" class="form-control form-control-sm"/></td>
+          <td>{{ b.total | currency:'ARS' }}</td>
+          <td>
+            <select [(ngModel)]="editModel.clientId" name="e_client_{{b.id}}" class="form-select form-select-sm">
+              <option *ngFor="let c of clients" [ngValue]="c.id">{{ c.name }}</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-success me-1" (click)="saveEdit()">Save</button>
+            <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Cancel</button>
+          </td>
+        </ng-container>
+
+        <!-- Vista normal -->
+        <ng-template #viewRow>
+          <td>{{ b.id }}</td>
+          <td>{{ b.date }}</td>
+          <td>{{ b.total | currency:'ARS' }}</td>
+          <td>{{ b.client }}</td>
+          <td>
+            <button class="btn btn-outline-primary btn-sm me-1" (click)="openPdfModal(b.id!)">
+              📄 View PDF
+            </button>
+
+            <!-- Solo ADMIN: Edit / Delete -->
+            <button *ngIf="auth.isAdmin()" class="btn btn-sm btn-warning me-1" (click)="startEdit(b)">✏️ Edit</button>
+            <button *ngIf="auth.isAdmin()" class="btn btn-sm btn-danger" (click)="deleteBudget(b.id!)">🗑️ Delete</button>
+          </td>
+        </ng-template>
+
       </tr>
     </tbody>
   </table>
 </div>
 
-<!-- MODAL DE PDF -->
-<div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="closePdfModal()">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Budget PDF Preview</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closePdfModal()"></button>
-      </div>
-      <div class="modal-body text-center" style="height: 80vh;">
-        <div *ngIf="isLoadingPdf" class="d-flex justify-content-center align-items-center h-100">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-
-        <iframe *ngIf="!isLoadingPdf && pdfUrl" [src]="pdfUrl | safeUrl" width="100%" height="100%" frameborder="0"></iframe>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- (Modal PDF opcional si luego volvés al iframe + safe pipe) -->
