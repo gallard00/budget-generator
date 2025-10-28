@@ -14,8 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
@@ -43,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole() != null ? request.getRole() : Role.ROLE_USER) // importante
+                .role(Role.ROLE_USER) // ✅ Siempre rol USER, nunca confiar en el request
                 .build();
 
         userRepository.save(u);

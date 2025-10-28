@@ -5,8 +5,10 @@ import com.nahuelgallardo.budgetgenerator.auth.security.jwt.JwtUtil;
 import com.nahuelgallardo.budgetgenerator.auth.security.user.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,13 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.List;
 
-@EnableMethodSecurity(prePostEnabled = true)
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true) // ✅ habilita seguridad por anotaciones si la necesitamos
 public class SecurityConfig {
+
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
@@ -38,49 +40,65 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                // 🔓 Permitir llamadas desde Angular (CORS)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // ❌ Desactivar CSRF (no se usa con JWT)
                 .csrf(csrf -> csrf.disable())
-                // 🔐 Configurar endpoints públicos y protegidos
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
+                        // 🔓 Rutas públicas
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                // 🚫 Sin sesiones (JWT es stateless)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // 🧩 Filtro JWT antes del filtro de autenticación
+                        // ✅ Clients — solo ADMIN puede crear o eliminar, USERS pueden ver
+                        .requestMatchers(HttpMethod.GET, "/api/clients/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/clients/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/clients/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/clients/**").hasRole("ADMIN")
+
+                        // ✅ Budgets — ambos pueden ver y crear
+                        .requestMatchers(HttpMethod.GET, "/api/budgets/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/budgets/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/budgets/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/budgets/**").hasRole("ADMIN")
+
+                        // ✅ Exportar PDF — solo ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/export/**").hasRole("ADMIN")
+
+                        // ✅ cualquier otra request requiere autenticación
+                        .anyRequest().authenticated()
+                );
+
+        // 🧩 Agregar el filtro JWT antes del filtro por username/password
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ⚙️ Autenticador base de Spring Security
+    // ✅ Authentication Manager
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
-    // 🔐 Encoder de contraseñas
+    // ✅ Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 🌐 Configuración CORS global
+    // ✅ Configuración global CORS para Angular
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Angular
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }

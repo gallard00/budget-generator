@@ -25,5 +25,6 @@ public class User {
     private String password;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER; // valor por defecto
 }
