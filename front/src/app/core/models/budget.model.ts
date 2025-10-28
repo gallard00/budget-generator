@@ -1,7 +1,7 @@
 import { BudgetItem } from './budget-item.model';
 
 /**
- * ✅ Representa un presupuesto completo dentro del sistema.
+ * Representa un presupuesto completo dentro del sistema.
  * 
  * Contiene la información principal del presupuesto, el cliente asociado
  * y la lista de ítems que lo componen.

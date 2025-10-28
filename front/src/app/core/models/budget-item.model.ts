@@ -1,4 +1,4 @@
-// ✅ Interface que representa un ítem dentro de un presupuesto (Budget)
+// Interface que representa un ítem dentro de un presupuesto (Budget)
 export interface BudgetItem {
   /** 
    * Identificador único del ítem.

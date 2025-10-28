@@ -1,5 +1,5 @@
 /**
- * ✅ Representa a un cliente dentro del sistema de presupuestos.
+ * Representa a un cliente dentro del sistema de presupuestos.
  * 
  * Cada cliente puede tener uno o varios presupuestos asociados,
  * por lo que esta entidad es fundamental para identificar al destinatario

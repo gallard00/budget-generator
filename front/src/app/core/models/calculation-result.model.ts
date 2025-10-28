@@ -1,5 +1,5 @@
 /**
- * ✅ Representa el resultado de un cálculo de superficie
+ * Representa el resultado de un cálculo de superficie
  * y costo total para un tipo de material determinado.
  */
 export interface CalculationResult {

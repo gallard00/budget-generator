@@ -1,7 +1,7 @@
 import { MaterialType } from './material-type.enum';
 
 /**
- * ✅ Representa los datos necesarios para realizar un cálculo
+ * Representa los datos necesarios para realizar un cálculo
  * de superficie y costo según el tipo de material seleccionado.
  */
 export interface CalculationInput {

@@ -1,11 +1,11 @@
 /**
- * ✅ Enumeración que define los distintos tipos de materiales
+ * Enumeración que define los distintos tipos de materiales
  * utilizados en los cálculos del presupuesto.
  * 
  * Cada valor del enum representa una categoría específica de material
  * que tiene un precio por metro cuadrado diferente en el sistema.
  * 
- * 🔹 Se utiliza principalmente dentro de `CalculationInput`
+ * Se utiliza principalmente dentro de `CalculationInput`
  * para asegurar que los materiales ingresados sean válidos y controlados.
  */
 export enum MaterialType {
