@@ -1,7 +1,8 @@
 // ✅ Importaciones principales de Angular
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { authInterceptor } from './core/guards/auth.interceptors';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
 // ✅ Importamos el archivo de rutas del proyecto
 import { routes } from './app.routes';
@@ -58,7 +59,7 @@ export const appConfig: ApplicationConfig = {
      * 💡 En tu caso, como usás Axios para la mayoría de requests, este provider es opcional,
      * pero lo mantenés por compatibilidad y escalabilidad futura.
      */
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptors([authInterceptor])),
 
     /**
      * 🚏 provideRouter(routes)

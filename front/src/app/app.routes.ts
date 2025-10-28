@@ -5,6 +5,9 @@ import { Routes } from '@angular/router';
 import { ClientsComponent } from './features/clients/clients.component';
 import { BudgetsComponent } from './features/budgets/budgets.component';
 import { CalculatorComponent } from './features/calculator/calculator.component';
+import { Login } from './features/auth/login/login.component';
+import { Register } from './features/auth/register/register.component';
+import { authGuard } from './core/guards/auth.guard';
 
 /**
  * 🗺️ Configuración de rutas principales de la aplicación
@@ -29,7 +32,10 @@ export const routes: Routes = [
    * - `redirectTo`: indica hacia dónde redirigir.
    * - `pathMatch: 'full'`: garantiza que la coincidencia sea exacta (no parcial).
    */
-  { path: '', redirectTo: 'clients', pathMatch: 'full' },
+  { path: '', redirectTo: '/clients', pathMatch: 'full' },
+
+  { path: 'auth/login', component: Login },
+  { path: 'auth/register', component: Register },
 
   /**
    * 👥 Ruta /clients
@@ -40,7 +46,7 @@ export const routes: Routes = [
    * - URL: http://localhost:4200/clients
    * - Renderiza el formulario + tabla de clientes.
    */
-  { path: 'clients', component: ClientsComponent },
+  { path: 'clients', canActivate: [authGuard], component: ClientsComponent },
 
   /**
    * 💰 Ruta /budgets
@@ -51,7 +57,7 @@ export const routes: Routes = [
    * - URL: http://localhost:4200/budgets
    * - Permite crear presupuestos, ver totales y exportar a PDF.
    */
-  { path: 'budgets', component: BudgetsComponent },
+  { path: 'budgets', canActivate: [authGuard], component: BudgetsComponent },
 
   /**
    * 🧮 Ruta /calculator
@@ -62,7 +68,7 @@ export const routes: Routes = [
    * - URL: http://localhost:4200/calculator
    * - Permite calcular m², precios y enviar resultados al presupuesto.
    */
-  { path: 'calculator', component: CalculatorComponent },
+  { path: 'calculator', canActivate: [authGuard], component: CalculatorComponent },
 
   /**
    * 🚧 Ruta comodín '**'
@@ -74,5 +80,5 @@ export const routes: Routes = [
    * 
    * 💡 Buena práctica para evitar errores 404.
    */
-  { path: '**', redirectTo: 'clients' }
+  { path: '**', redirectTo: '/clients' }
 ];
