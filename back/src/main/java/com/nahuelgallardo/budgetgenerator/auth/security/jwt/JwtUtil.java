@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -22,16 +23,23 @@ public class JwtUtil {
         this.jwtExpirationMs = jwtExpirationMs;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    // ✅ NUEVO: token con claims personalizados
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
+                .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // ✅ Antiguo método (para compatibilidad)
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(Map.of(), userDetails);
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
@@ -43,14 +51,15 @@ public class JwtUtil {
         return parseClaims(token).getSubject();
     }
 
+    public Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     private boolean isTokenExpired(String token) {
         return parseClaims(token).getExpiration().before(new Date());
     }
-
-    private Claims parseClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody();
-    }
-
-
 }

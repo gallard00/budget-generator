@@ -7,6 +7,7 @@ import com.nahuelgallardo.budgetgenerator.auth.model.Role;
 import com.nahuelgallardo.budgetgenerator.auth.model.User;
 import com.nahuelgallardo.budgetgenerator.auth.repository.UserRepository;
 import com.nahuelgallardo.budgetgenerator.auth.security.jwt.JwtUtil;
+import com.nahuelgallardo.budgetgenerator.auth.security.user.CustomUserDetails;
 import com.nahuelgallardo.budgetgenerator.auth.service.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,8 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class AuthServiceImpl implements AuthService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -41,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ROLE_USER) // ✅ Siempre rol USER, nunca confiar en el request
+                .role(Role.ROLE_USER) // ✅ Siempre rol USER por defecto
                 .build();
 
         userRepository.save(u);
@@ -53,11 +58,14 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        String token = jwtUtil.generateToken(auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails
-                ? (org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal()
-                : null);
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+
+        // ✅ Incluir el rol en los claims del token
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getUser().getRole().name());
+
+        String token = jwtUtil.generateToken(claims, userDetails);
 
         return new AuthResponse(token);
     }
-
 }

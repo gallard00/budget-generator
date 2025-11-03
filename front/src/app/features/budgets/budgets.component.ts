@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-budgets',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafeUrlPipe],
+  imports: [CommonModule, FormsModule],
   templateUrl: './budgets.component.html',
   styleUrls: ['./budgets.component.scss']
 })
