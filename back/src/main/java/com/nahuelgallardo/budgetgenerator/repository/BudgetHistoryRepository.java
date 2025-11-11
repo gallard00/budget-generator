@@ -4,6 +4,9 @@ import com.nahuelgallardo.budgetgenerator.model.BudgetHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface BudgeHistoryRepository extends JpaRepository<BudgetHistory, Long> {
+    List<BudgetHistory> findByBudgetId(Long budgetId);
 }
