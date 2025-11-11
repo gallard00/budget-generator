@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BudgeHistoryRepository extends JpaRepository<BudgetHistory, Long> {
+public interface BudgetHistoryRepository extends JpaRepository<BudgetHistory, Long> {
     List<BudgetHistory> findByBudgetId(Long budgetId);
 }
