@@ -4,12 +4,17 @@ import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetRequest;
 import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetResponse;
 import com.nahuelgallardo.budgetgenerator.mapper.BudgetMapper;
 import com.nahuelgallardo.budgetgenerator.model.Budget;
+import com.nahuelgallardo.budgetgenerator.model.BudgetHistory;
 import com.nahuelgallardo.budgetgenerator.model.Client;
+import com.nahuelgallardo.budgetgenerator.repository.BudgetHistoryRepository;
 import com.nahuelgallardo.budgetgenerator.repository.BudgetRepository;
 import com.nahuelgallardo.budgetgenerator.repository.ClientRepository;
 import com.nahuelgallardo.budgetgenerator.service.IBudgetService;
 import org.springframework.stereotype.Service;
+import com.google.gson.Gson;
 
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,11 +23,13 @@ import java.util.stream.Collectors;
 public class BudgetServiceImpl implements IBudgetService {
     private final BudgetRepository budgetRepository;
     private final ClientRepository clientRepository;
+    private final BudgetHistoryRepository historyRepo;
     private final BudgetMapper mapper;
 
-    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetMapper mapper) {
+    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetMapper mapper, BudgetHistoryRepository historyRepo) {
         this.budgetRepository = budgetRepository;
         this.clientRepository = clientRepository;
+        this.historyRepo = historyRepo;
         this.mapper = mapper;
     }
 
@@ -71,6 +78,16 @@ public class BudgetServiceImpl implements IBudgetService {
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
 
+        // 🧠 Crear registro histórico antes de actualizar
+        BudgetHistory history = BudgetHistory.builder()
+                .changeDate(LocalDate.now())
+                .previousData(new Gson().toJson(existing)) // convertimos a JSON
+                .budget(existing)
+                .build();
+
+        historyRepo.save(history);
+
+        // 🔄 Actualizar datos
         existing.setDate(request.getDate());
         existing.setClient(client);
 
