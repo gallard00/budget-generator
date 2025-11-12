@@ -22,7 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // ✅ habilita seguridad por anotaciones si la necesitamos
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
@@ -47,48 +47,45 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // 🔓 Rutas públicas
+                        // 🔓 Endpoints públicos
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        // ✅ Clients — solo ADMIN puede crear o eliminar, USERS pueden ver
-                        .requestMatchers(HttpMethod.GET, "/api/clients/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/clients/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/clients/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/clients/**").hasRole("ADMIN")
+                        // 👥 Clients
+                        .requestMatchers(HttpMethod.GET, "/api/clients/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/clients/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/clients/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/clients/**").hasAuthority("ROLE_ADMIN")
 
-                        // ✅ Budgets — ambos pueden ver y crear
-                        .requestMatchers(HttpMethod.GET, "/api/budgets/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/budgets/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/budgets/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/budgets/**").hasRole("ADMIN")
+                        // 💰 Budgets
+                        .requestMatchers(HttpMethod.GET, "/api/budgets/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/budgets/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/budgets/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/budgets/**").hasAuthority("ROLE_ADMIN")
 
-                        // ✅ Exportar PDF — solo ADMIN
-                        .requestMatchers(HttpMethod.GET, "/api/export/**").hasRole("ADMIN")
+                        // 📄 Exportar PDF — solo ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/export/**").hasAuthority("ROLE_ADMIN")
 
-                        // ✅ cualquier otra request requiere autenticación
+                        // 🔒 Cualquier otra request requiere autenticación
                         .anyRequest().authenticated()
                 );
 
-        // 🧩 Agregar el filtro JWT antes del filtro por username/password
+        // 🔐 Agregamos el filtro JWT
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Authentication Manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // ✅ Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Configuración global CORS para Angular
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

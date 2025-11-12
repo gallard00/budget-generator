@@ -78,7 +78,7 @@ public class BudgetServiceImpl implements IBudgetService {
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
 
-        // 🧠 Crear registro histórico antes de actualizar
+        //  Crear registro histórico antes de actualizar
         BudgetHistory history = BudgetHistory.builder()
                 .changeDate(LocalDate.now())
                 .previousData(new Gson().toJson(existing)) // convertimos a JSON
@@ -87,7 +87,7 @@ public class BudgetServiceImpl implements IBudgetService {
 
         historyRepo.save(history);
 
-        // 🔄 Actualizar datos
+        // Actualizar datos
         existing.setDate(request.getDate());
         existing.setClient(client);
 
