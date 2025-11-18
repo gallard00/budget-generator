@@ -42,15 +42,35 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Email already in use");
         }
 
+        // Rol por defecto
+        Role assignedRole = Role.ROLE_USER;
+
+        // Si viene un rol por JSON, validamos
+        if (request.getRole() != null) {
+
+            // Seguridad: evitar registrar admins accidentalmente
+            if (request.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+                throw new RuntimeException("Forbidden: cannot self-register as ADMIN");
+            }
+
+            // Aceptamos solo roles válidos existentes
+            try {
+                assignedRole = Role.valueOf(request.getRole());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid role: " + request.getRole());
+            }
+        }
+
         User u = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ROLE_USER) // ✅ Siempre rol USER por defecto
+                .role(assignedRole)
                 .build();
 
         userRepository.save(u);
     }
+
 
     @Override
     public AuthResponse login(AuthRequest request) {
@@ -60,12 +80,24 @@ public class AuthServiceImpl implements AuthService {
 
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-        // ✅ Incluir el rol en los claims del token
+        // Claims personalizados
         Map<String, Object> claims = new HashMap<>();
+
+        // ⬅️ AGREGAR ESTO: las authorities que Spring Security necesita
+        claims.put("authorities",
+                userDetails.getAuthorities()
+                        .stream()
+                        .map(a -> a.getAuthority())
+                        .toList()
+        );
+
+        // Opcional: dejar tu field "role" si querés
         claims.put("role", userDetails.getUser().getRole().name());
 
+        // Generar token con roles incluidos
         String token = jwtUtil.generateToken(claims, userDetails);
 
         return new AuthResponse(token);
     }
+
 }
