@@ -23,10 +23,17 @@ public class JwtUtil {
         this.jwtExpirationMs = jwtExpirationMs;
     }
 
-    // ✅ NUEVO: token con claims personalizados
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + jwtExpirationMs);
+
+        // Agrego los roles al JWT automáticamente
+        extraClaims.put("authorities",
+                userDetails.getAuthorities()
+                        .stream()
+                        .map(auth -> auth.getAuthority())
+                        .toList()
+        );
 
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -37,10 +44,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ✅ Antiguo método (para compatibilidad)
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(Map.of(), userDetails);
-    }
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
