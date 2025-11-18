@@ -2,19 +2,15 @@ package com.nahuelgallardo.budgetgenerator.service.impl;
 
 import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetRequest;
 import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetResponse;
+import com.nahuelgallardo.budgetgenerator.mapper.BudgetItemMapper;
 import com.nahuelgallardo.budgetgenerator.mapper.BudgetMapper;
 import com.nahuelgallardo.budgetgenerator.model.Budget;
-import com.nahuelgallardo.budgetgenerator.model.BudgetHistory;
 import com.nahuelgallardo.budgetgenerator.model.Client;
-import com.nahuelgallardo.budgetgenerator.repository.BudgetHistoryRepository;
 import com.nahuelgallardo.budgetgenerator.repository.BudgetRepository;
 import com.nahuelgallardo.budgetgenerator.repository.ClientRepository;
 import com.nahuelgallardo.budgetgenerator.service.IBudgetService;
+import com.nahuelgallardo.budgetgenerator.service.IBudgetHistoryService;
 import org.springframework.stereotype.Service;
-import com.google.gson.Gson;
-
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,14 +19,16 @@ import java.util.stream.Collectors;
 public class BudgetServiceImpl implements IBudgetService {
     private final BudgetRepository budgetRepository;
     private final ClientRepository clientRepository;
-    private final BudgetHistoryRepository historyRepo;
+    private final IBudgetHistoryService historyService;
     private final BudgetMapper mapper;
+    private final BudgetItemMapper itemMapper;
 
-    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetMapper mapper, BudgetHistoryRepository historyRepo) {
+    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetMapper mapper, IBudgetHistoryService historyService, BudgetItemMapper itemMapper) {
         this.budgetRepository = budgetRepository;
         this.clientRepository = clientRepository;
-        this.historyRepo = historyRepo;
         this.mapper = mapper;
+        this.historyService = historyService;
+        this.itemMapper = itemMapper;
     }
 
     @Override
@@ -78,27 +76,26 @@ public class BudgetServiceImpl implements IBudgetService {
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
 
-        /*  Crear registro histórico antes de actualizar
-        BudgetHistory history = BudgetHistory.builder()
-                .changeDate(LocalDate.now())
-                .previousData(new Gson().toJson(existing)) // convertimos a JSON
-                .budget(existing)
-                .build();
-
-        historyRepo.save(history);
-*/
+        // Crear registro histórico antes de actualizar
+        historyService.recordSnapshot(existing);
         // Actualizar datos
         existing.setDate(request.getDate());
         existing.setClient(client);
 
         existing.getItems().clear();
-        if (request.getItems() != null) {
-            request.getItems().forEach(itemReq -> {
-                var item = mapper.toEntity(request, client).getItems().get(0);
-                item.setBudget(existing);
-                existing.getItems().add(item);
-            });
-        }
+        var updatedItems = Optional.ofNullable(request.getItems())
+                .map(items -> items.stream()
+                        .map(itemMapper::toEntity)
+                        .peek(item -> item.setBudget(existing))
+                        .toList())
+                .orElse(List.of());
+
+        existing.getItems().addAll(updatedItems);
+
+        double total = existing.getItems().stream()
+                .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
+                .sum();
+        existing.setTotal(total);
 
         Budget updated = budgetRepository.save(existing);
         return mapper.toResponse(updated);

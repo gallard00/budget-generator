@@ -5,8 +5,8 @@ import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetRequest;
 import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetResponse;
 import com.nahuelgallardo.budgetgenerator.model.Budget;
 import com.nahuelgallardo.budgetgenerator.model.BudgetHistory;
-import com.nahuelgallardo.budgetgenerator.repository.BudgetHistoryRepository;
 import com.nahuelgallardo.budgetgenerator.service.IBudgetService;
+import com.nahuelgallardo.budgetgenerator.service.IBudgetHistoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +17,11 @@ import java.util.List;
 @RequestMapping("/api/budgets")
 public class BudgetController {
     private final IBudgetService service;
-    private final BudgetHistoryRepository historyRepo;
+    private final IBudgetHistoryService historyService;
 
-    public BudgetController(IBudgetService service, BudgetHistoryRepository historyRepo) {
+    public BudgetController(IBudgetService service, IBudgetHistoryService historyService) {
         this.service = service;
-        this.historyRepo = historyRepo;
+        this.historyService = historyService;
     }
 
     @GetMapping
@@ -59,7 +59,7 @@ public class BudgetController {
 
     @GetMapping("/{id}/history")
     public ResponseEntity<List<BudgetHistory>> getHistory(@PathVariable Long id) {
-        return ResponseEntity.ok(historyRepo.findByBudgetId(id));
+        return ResponseEntity.ok(historyService.findByBudgetId(id));
     }
 
 }

@@ -37,6 +37,7 @@ public class Budget {
 
 
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<BudgetHistory> histories = new ArrayList<>();
 
 }

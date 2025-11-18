@@ -27,5 +27,6 @@ public class BudgetHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budget_id")
+    @JsonBackReference
     private Budget budget;
 }
