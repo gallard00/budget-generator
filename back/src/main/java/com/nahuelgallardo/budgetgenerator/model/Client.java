@@ -1,6 +1,6 @@
 package com.nahuelgallardo.budgetgenerator.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,8 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "clients")
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

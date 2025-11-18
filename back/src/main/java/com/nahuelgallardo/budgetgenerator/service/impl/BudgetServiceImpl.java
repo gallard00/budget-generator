@@ -1,17 +1,21 @@
 package com.nahuelgallardo.budgetgenerator.service.impl;
 
+import com.google.gson.Gson;
+import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetItemRequest;
 import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetRequest;
 import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetResponse;
+import com.nahuelgallardo.budgetgenerator.mapper.BudgetItemMapper;
 import com.nahuelgallardo.budgetgenerator.mapper.BudgetMapper;
 import com.nahuelgallardo.budgetgenerator.model.Budget;
 import com.nahuelgallardo.budgetgenerator.model.BudgetHistory;
 import com.nahuelgallardo.budgetgenerator.model.Client;
+import com.nahuelgallardo.budgetgenerator.model.snapshot.BudgetItemSnapshot;
+import com.nahuelgallardo.budgetgenerator.model.snapshot.BudgetSnapshot;
 import com.nahuelgallardo.budgetgenerator.repository.BudgetHistoryRepository;
 import com.nahuelgallardo.budgetgenerator.repository.BudgetRepository;
 import com.nahuelgallardo.budgetgenerator.repository.ClientRepository;
 import com.nahuelgallardo.budgetgenerator.service.IBudgetService;
 import org.springframework.stereotype.Service;
-import com.google.gson.Gson;
 
 
 import java.time.LocalDate;
@@ -24,12 +28,14 @@ public class BudgetServiceImpl implements IBudgetService {
     private final BudgetRepository budgetRepository;
     private final ClientRepository clientRepository;
     private final BudgetHistoryRepository historyRepo;
+    private final BudgetItemMapper itemMapper;
     private final BudgetMapper mapper;
 
-    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetMapper mapper, BudgetHistoryRepository historyRepo) {
+    public BudgetServiceImpl(BudgetRepository budgetRepository, ClientRepository clientRepository, BudgetItemMapper itemMapper, BudgetHistoryRepository historyRepo, BudgetMapper mapper) {
         this.budgetRepository = budgetRepository;
         this.clientRepository = clientRepository;
         this.historyRepo = historyRepo;
+        this.itemMapper = itemMapper;
         this.mapper = mapper;
     }
 
@@ -78,34 +84,69 @@ public class BudgetServiceImpl implements IBudgetService {
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found with id " + request.getClientId()));
 
-        /*  Crear registro histórico antes de actualizar
+        // 1) Snapshot
+        String previousJson = new Gson().toJson(toSnapshot(existing));
+
         BudgetHistory history = BudgetHistory.builder()
                 .changeDate(LocalDate.now())
-                .previousData(new Gson().toJson(existing)) // convertimos a JSON
+                .previousData(previousJson)
                 .budget(existing)
                 .build();
 
-        historyRepo.save(history);
-*/
-        // Actualizar datos
+        existing.getHistories().add(history);
+
+        // 2) Actualizar datos base
         existing.setDate(request.getDate());
         existing.setClient(client);
 
+        // 3) Reemplazar items
         existing.getItems().clear();
+
         if (request.getItems() != null) {
-            request.getItems().forEach(itemReq -> {
-                var item = mapper.toEntity(request, client).getItems().get(0);
+            for (BudgetItemRequest itemReq : request.getItems()) {
+                var item = itemMapper.toEntity(itemReq);
                 item.setBudget(existing);
                 existing.getItems().add(item);
-            });
+            }
         }
 
+        // 4) Recalcular total
+        double total = existing.getItems().stream()
+                .mapToDouble(i -> i.getQuantity() * i.getUnitPrice())
+                .sum();
+
+        existing.setTotal(total);
+
+        // 5) Guardar
         Budget updated = budgetRepository.save(existing);
         return mapper.toResponse(updated);
     }
+
+
 
     @Override
     public void delete(Long id) {
         budgetRepository.deleteById(id);
     }
+
+    private BudgetSnapshot toSnapshot(Budget b) {
+        BudgetSnapshot snap = new BudgetSnapshot();
+        snap.setId(b.getId());
+        snap.setDate(b.getDate());
+        snap.setTotal(b.getTotal());
+        snap.setClientId(b.getClient().getId());
+
+        snap.setItems(
+                b.getItems().stream().map(i -> {
+                    BudgetItemSnapshot si = new BudgetItemSnapshot();
+                    si.setDescription(i.getDescription());
+                    si.setUnitPrice(i.getUnitPrice());
+                    si.setQuantity(i.getQuantity());
+                    return si;
+                }).toList()
+        );
+
+        return snap;
+    }
+
 }

@@ -1,10 +1,8 @@
 package com.nahuelgallardo.budgetgenerator.dtos.request.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class BudgetItemResponse {
     private Long id;
     private String description;

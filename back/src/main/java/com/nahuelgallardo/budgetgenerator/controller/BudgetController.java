@@ -57,9 +57,10 @@ public class BudgetController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/history")
-    public ResponseEntity<List<BudgetHistory>> getHistory(@PathVariable Long id) {
-        return ResponseEntity.ok(historyRepo.findByBudgetId(id));
+    @GetMapping("/{budgetId}/history")
+    public List<BudgetHistory> getHistory(@PathVariable Long budgetId) {
+        return historyRepo.findByBudgetId(budgetId);
     }
+
 
 }

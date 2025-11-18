@@ -1,13 +1,11 @@
 package com.nahuelgallardo.budgetgenerator.dtos.request.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class BudgetRequest {
     private LocalDate date;
     private Long clientId;

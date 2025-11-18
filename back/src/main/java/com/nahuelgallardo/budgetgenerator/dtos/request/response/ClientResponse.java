@@ -1,10 +1,8 @@
 package com.nahuelgallardo.budgetgenerator.dtos.request.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class ClientResponse {
     private Long id;
     private String name;

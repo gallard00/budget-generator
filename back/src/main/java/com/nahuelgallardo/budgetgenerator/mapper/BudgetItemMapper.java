@@ -19,13 +19,18 @@ public class BudgetItemMapper {
 
     public BudgetItemResponse toResponse(BudgetItem entity) {
         if (entity == null) return null;
+
         BudgetItemResponse response = new BudgetItemResponse();
         response.setId(entity.getId());
         response.setDescription(entity.getDescription());
         response.setQuantity(entity.getQuantity());
         response.setUnitPrice(entity.getUnitPrice());
-        if (entity.getQuantity() != null && entity.getUnitPrice() != null)
+
+        if (entity.getQuantity() != null && entity.getUnitPrice() != null) {
             response.setSubtotal(entity.getQuantity() * entity.getUnitPrice());
+        }
+
         return response;
     }
 }
+
