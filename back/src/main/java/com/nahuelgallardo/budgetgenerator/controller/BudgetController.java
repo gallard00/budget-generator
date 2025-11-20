@@ -2,7 +2,9 @@ package com.nahuelgallardo.budgetgenerator.controller;
 
 
 import com.nahuelgallardo.budgetgenerator.dtos.request.request.BudgetRequest;
+import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetHistoryResponse;
 import com.nahuelgallardo.budgetgenerator.dtos.request.response.BudgetResponse;
+import com.nahuelgallardo.budgetgenerator.mapper.BudgetHistoryMapper;
 import com.nahuelgallardo.budgetgenerator.model.Budget;
 import com.nahuelgallardo.budgetgenerator.model.BudgetHistory;
 import com.nahuelgallardo.budgetgenerator.repository.BudgetHistoryRepository;
@@ -18,10 +20,13 @@ import java.util.List;
 public class BudgetController {
     private final IBudgetService service;
     private final BudgetHistoryRepository historyRepo;
+    private final BudgetHistoryMapper historyMapper;
 
-    public BudgetController(IBudgetService service, BudgetHistoryRepository historyRepo) {
+
+    public BudgetController(IBudgetService service, BudgetHistoryRepository historyRepo, BudgetHistoryMapper historyMapper) {
         this.service = service;
         this.historyRepo = historyRepo;
+        this.historyMapper = historyMapper;
     }
 
     @GetMapping
@@ -58,9 +63,12 @@ public class BudgetController {
     }
 
     @GetMapping("/{budgetId}/history")
-    public List<BudgetHistory> getHistory(@PathVariable Long budgetId) {
-        return historyRepo.findByBudgetId(budgetId);
+    public List<BudgetHistoryResponse> getHistory(@PathVariable Long budgetId) {
+        return historyRepo.findByBudgetId(budgetId).stream()
+                .map(historyMapper::toResponse)
+                .toList();
     }
+
 
 
 }
