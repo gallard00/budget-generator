@@ -1,10 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { ClientService } from '../../core/services/client.service';
 import { Client } from '../../core/models/client.model';
 import { AuthService } from '../../core/services/auth.service';
 
+/**
+ * Componente encargado de gestionar los clientes.
+ * 
+ * Responsabilidades (SRP):
+ * - Mostrar lista de clientes
+ * - Crear nuevos clientes
+ * - Editar clientes existentes
+ * - Eliminar clientes (solo ADMIN)
+ * 
+ * No contiene lógica de negocio ni HTTP:
+ * toda la comunicación con la API está delegada al ClientService,
+ * lo que cumple el principio de inversión de dependencias (DIP).
+ */
 @Component({
   selector: 'app-clients',
   standalone: true,
@@ -13,52 +27,71 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrls: ['./clients.component.scss']
 })
 export class ClientsComponent implements OnInit {
+
+  /** Lista de clientes cargados desde el backend */
   clients: Client[] = [];
+
+  /** Modelo para crear un cliente nuevo */
   newClient: Client = { name: '', phone: '', address: '' };
 
-  // edición
+  /** Modo edición */
   editId: number | null = null;
+
+  /** Modelo temporal para edición */
   editModel: Client = { name: '', phone: '', address: '' };
 
-  constructor(private clientService: ClientService, public auth: AuthService) {}
+  constructor(
+    private clientService: ClientService,
+    public auth: AuthService
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadClients();
   }
 
-  loadClients() {
+  /** Carga los clientes desde la API */
+  loadClients(): void {
     this.clientService.getAll().subscribe(res => this.clients = res);
   }
 
-  createClient() {
+  /** Crea un nuevo cliente */
+  createClient(): void {
     if (!this.newClient.name || !this.newClient.phone || !this.newClient.address) return;
+
     this.clientService.create(this.newClient).subscribe(() => {
       this.newClient = { name: '', phone: '', address: '' };
       this.loadClients();
     });
   }
 
-  startEdit(c: Client) {
+  /** Entra en modo edición */
+  startEdit(c: Client): void {
     if (!this.auth.isAdmin()) return;
+
     this.editId = c.id!;
-    this.editModel = { ...c };
+    this.editModel = { ...c }; // copia profunda
   }
 
-  cancelEdit() {
+  /** Cancela la edición actual */
+  cancelEdit(): void {
     this.editId = null;
     this.editModel = { name: '', phone: '', address: '' };
   }
 
-  saveEdit() {
+  /** Guarda los cambios del cliente editado */
+  saveEdit(): void {
     if (this.editId == null) return;
+
     this.clientService.update(this.editId, this.editModel).subscribe(() => {
       this.cancelEdit();
       this.loadClients();
     });
   }
 
-  deleteClient(id?: number) {
+  /** Elimina un cliente (solo ADMIN) */
+  deleteClient(id?: number): void {
     if (!id || !this.auth.isAdmin()) return;
+
     this.clientService.delete(id).subscribe(() => this.loadClients());
   }
 }

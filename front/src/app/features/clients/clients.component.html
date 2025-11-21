@@ -1,51 +1,85 @@
 <div class="card p-4 shadow-sm">
+
   <h4>Clients</h4>
 
+  <!-- FORMULARIO DE CREACIÓN -->
   <form class="row g-2 mb-3" (ngSubmit)="createClient()">
+
     <div class="col-md-4">
-      <input [(ngModel)]="newClient.name" name="name" placeholder="Name" class="form-control" />
+      <input [(ngModel)]="newClient.name" name="name" class="form-control" placeholder="Name" />
     </div>
+
     <div class="col-md-4">
-      <input [(ngModel)]="newClient.phone" name="phone" placeholder="Phone" class="form-control" />
+      <input [(ngModel)]="newClient.phone" name="phone" class="form-control" placeholder="Phone" />
     </div>
+
     <div class="col-md-4">
-      <input [(ngModel)]="newClient.address" name="address" placeholder="Address" class="form-control" />
+      <input [(ngModel)]="newClient.address" name="address" class="form-control" placeholder="Address" />
     </div>
+
     <div class="col-12 mt-2">
       <button class="btn btn-primary w-100">Add Client</button>
     </div>
+
   </form>
 
+  <!-- TABLA DE CLIENTES -->
   <table class="table table-striped mt-3">
+
     <thead>
-      <tr><th>ID</th><th>Name</th><th>Phone</th><th>Address</th><th *ngIf="auth.isAdmin()">Actions</th></tr>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th *ngIf="auth.isAdmin()">Actions</th>
+      </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let c of clients">
+
         <td>{{ c.id }}</td>
 
-        <!-- modo edición -->
+        <!-- MODO EDICIÓN -->
         <ng-container *ngIf="editId === c.id; else viewRow">
-          <td><input [(ngModel)]="editModel.name" name="e_name_{{c.id}}"  class="form-control form-control-sm" /></td>
-          <td><input [(ngModel)]="editModel.phone" name="e_phone_{{c.id}}" class="form-control form-control-sm" /></td>
-          <td><input [(ngModel)]="editModel.address" name="e_addr_{{c.id}}" class="form-control form-control-sm" /></td>
+
+          <td>
+            <input [(ngModel)]="editModel.name" name="e_name_{{c.id}}" class="form-control form-control-sm" />
+          </td>
+
+          <td>
+            <input [(ngModel)]="editModel.phone" name="e_phone_{{c.id}}" class="form-control form-control-sm" />
+          </td>
+
+          <td>
+            <input [(ngModel)]="editModel.address" name="e_addr_{{c.id}}" class="form-control form-control-sm" />
+          </td>
+
           <td *ngIf="auth.isAdmin()">
             <button class="btn btn-sm btn-success me-1" (click)="saveEdit()">Save</button>
             <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Cancel</button>
           </td>
+
         </ng-container>
 
-        <!-- vista normal -->
+        <!-- VISTA NORMAL -->
         <ng-template #viewRow>
+
           <td>{{ c.name }}</td>
           <td>{{ c.phone }}</td>
           <td>{{ c.address }}</td>
+
           <td *ngIf="auth.isAdmin()">
             <button class="btn btn-sm btn-warning me-1" (click)="startEdit(c)">Edit</button>
             <button class="btn btn-sm btn-danger" (click)="deleteClient(c.id)">Delete</button>
           </td>
+
         </ng-template>
+
       </tr>
     </tbody>
+
   </table>
+
 </div>
