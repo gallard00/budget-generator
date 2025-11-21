@@ -1,44 +1,25 @@
 import { BudgetItem } from './budget-item.model';
 
 /**
- * Representa un presupuesto completo dentro del sistema.
- * 
- * Contiene la información principal del presupuesto, el cliente asociado
- * y la lista de ítems que lo componen.
+ * Presupuesto completo.
  */
 export interface Budget {
-  /** 
-   * Identificador único del presupuesto.
-   * Opcional porque se genera automáticamente al guardar en la base de datos.
-   */
+  /** ID generado por el backend. */
   id?: number;
 
-  /** 
-   * Fecha del presupuesto en formato ISO (YYYY-MM-DD).
-   */
+  /** Fecha del presupuesto (YYYY-MM-DD). */
   date: string;
 
-  /** 
-   * Total calculado del presupuesto (suma de los subtotales de cada ítem).
-   * Opcional porque puede calcularse en el backend.
-   */
+  /** Total calculado, opcional (lo define el backend). */
   total?: number;
 
-  /** 
-   * Identificador del cliente al que pertenece este presupuesto.
-   * Es obligatorio ya que todo presupuesto debe asociarse a un cliente.
-   */
+  /** ID del cliente asociado. */
   clientId: number;
 
-  /** 
-   * Nombre del cliente (campo de conveniencia para mostrar en el frontend).
-   * No siempre está presente, depende de la respuesta del backend.
-   */
+  /** Nombre del cliente (campo de conveniencia para mostrar). */
   client?: string;
 
-  /** 
-   * Lista de ítems que forman parte del presupuesto.
-   * Cada ítem contiene descripción, cantidad y precio unitario.
-   */
+  /** Lista de ítems incluidos en el presupuesto. */
   items: BudgetItem[];
 }
+

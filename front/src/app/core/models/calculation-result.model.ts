@@ -1,17 +1,11 @@
 /**
- * Representa el resultado de un cálculo de superficie
- * y costo total para un tipo de material determinado.
+ * Resultado de un cálculo de superficie y costo.
  */
 export interface CalculationResult {
-  /**
-   * Superficie total calculada en metros cuadrados (m²).
-   * Se obtiene multiplicando el ancho por el alto del área.
-   */
+  /** Superficie total calculada en m². */
   squareMeters: number;
 
-  /**
-   * Precio total estimado del trabajo o material.
-   * Se calcula como `squareMeters * precioPorMetroCuadrado`.
-   */
+  /** Precio total estimado. */
   totalPrice: number;
 }
+

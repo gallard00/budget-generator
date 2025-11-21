@@ -1,23 +1,17 @@
-// Interface que representa un ítem dentro de un presupuesto (Budget)
+/**
+ * Ítem dentro de un presupuesto.
+ */
 export interface BudgetItem {
-  /** 
-   * Identificador único del ítem.
-   * Opcional porque todavía no existe antes de persistir en la base de datos.
-   */
+  /** ID generado por el backend. */
   id?: number;
 
-  /** 
-   * Descripción del ítem (por ejemplo, “Pintura interior” o “Revoque fino”).
-   */
+  /** Descripción del trabajo o material. */
   description: string;
 
-  /** 
-   * Cantidad del ítem (puede representar unidades, metros cuadrados, etc.).
-   */
+  /** Cantidad (unidades, m², etc.). */
   quantity: number;
 
-  /** 
-   * Precio unitario del ítem, expresado en moneda local (ARS).
-   */
+  /** Precio unitario del ítem. */
   unitPrice: number;
 }
+
