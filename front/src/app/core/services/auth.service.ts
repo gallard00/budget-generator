@@ -1,12 +1,16 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+/**
+ * Servicio de autenticación:
+ * login, registro, manejo de token y roles.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api/auth';
 
-  // Signal con el token
+  /** Token JWT reactivo (signal). */
   token = signal<string | null>(localStorage.getItem('token'));
 
   login(email: string, password: string) {
@@ -27,13 +31,16 @@ export class AuthService {
     return !!t && t.length > 10;
   }
 
-  // Lee el payload del JWT y devuelve el rol ("ROLE_USER"/"ROLE_ADMIN")
+  /**
+   * Obtiene el rol desde el payload del JWT
+   * ("ROLE_USER" / "ROLE_ADMIN").
+   */
   getRole(): string | null {
     const t = this.token();
     if (!t) return null;
+
     try {
       const payload = JSON.parse(atob(t.split('.')[1]));
-      // Puede venir como "authorities" (array) o "role" (string) según tu JwtUtil
       const authorities = payload.authorities ?? payload.role ?? null;
       if (!authorities) return null;
       return Array.isArray(authorities) ? authorities[0] : authorities;
@@ -42,6 +49,7 @@ export class AuthService {
     }
   }
 
+  /** True si el usuario actual es ADMIN. */
   isAdmin(): boolean {
     return this.getRole() === 'ROLE_ADMIN';
   }
@@ -51,3 +59,4 @@ export class AuthService {
     localStorage.removeItem('token');
   }
 }
+
