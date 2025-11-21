@@ -1,0 +1,35 @@
+<div class="card p-4 shadow-sm history-container">
+
+  <h4>History for budget #{{ budgetId }}</h4>
+
+  <a routerLink="/budgets" class="btn btn-link p-0 mb-3">← Back to budgets</a>
+
+  <div *ngIf="loading">
+    Loading history...
+  </div>
+
+  <div *ngIf="!loading && history.length === 0" class="alert alert-info">
+    No history registered for this budget.
+  </div>
+
+  <ul *ngIf="!loading && history.length > 0" class="list-group">
+    <li *ngFor="let h of history" class="list-group-item">
+
+      <div class="d-flex justify-content-between">
+        <div>
+          <strong>Change date:</strong> {{ h.changeDate }}
+        </div>
+        <span class="badge bg-secondary">
+          ID: {{ h.id }}
+        </span>
+      </div>
+
+      <details class="mt-2">
+        <summary>View previous data (JSON snapshot)</summary>
+        <pre class="mt-2">{{ h.previousData }}</pre>
+      </details>
+
+    </li>
+  </ul>
+
+</div>
