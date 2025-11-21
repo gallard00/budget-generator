@@ -59,7 +59,9 @@
         <!-- Modo edición -->
         <ng-container *ngIf="editId === b.id; else viewRow">
           <td>{{ b.id }}</td>
-          <td><input [(ngModel)]="editModel.date" name="e_date_{{b.id}}" type="date" class="form-control form-control-sm"/></td>
+          <td>
+            <input [(ngModel)]="editModel.date" name="e_date_{{b.id}}" type="date" class="form-control form-control-sm"/>
+          </td>
           <td>{{ b.total | currency:'ARS' }}</td>
           <td>
             <select [(ngModel)]="editModel.clientId" name="e_client_{{b.id}}" class="form-select form-select-sm">
@@ -79,13 +81,34 @@
           <td>{{ b.total | currency:'ARS' }}</td>
           <td>{{ b.client }}</td>
           <td>
+
+            <!-- Ver PDF -->
             <button class="btn btn-outline-primary btn-sm me-1" (click)="openPdfModal(b.id!)">
               📄 View PDF
             </button>
 
+            <!-- Ver historial (solo ADMIN) -->
+            <button 
+              *ngIf="auth.isAdmin()" 
+              class="btn btn-sm btn-info me-1"
+              (click)="viewHistory(b.id!)">
+              📜 History
+            </button>
+
             <!-- Solo ADMIN: Edit / Delete -->
-            <button *ngIf="auth.isAdmin()" class="btn btn-sm btn-warning me-1" (click)="startEdit(b)">✏️ Edit</button>
-            <button *ngIf="auth.isAdmin()" class="btn btn-sm btn-danger" (click)="deleteBudget(b.id!)">🗑️ Delete</button>
+            <button 
+              *ngIf="auth.isAdmin()" 
+              class="btn btn-sm btn-warning me-1" 
+              (click)="startEdit(b)">
+              ✏️ Edit
+            </button>
+
+            <button 
+              *ngIf="auth.isAdmin()" 
+              class="btn btn-sm btn-danger" 
+              (click)="deleteBudget(b.id!)">
+              🗑️ Delete
+            </button>
           </td>
         </ng-template>
 
@@ -93,5 +116,3 @@
     </tbody>
   </table>
 </div>
-
-<!-- (Modal PDF opcional si luego volvés al iframe + safe pipe) -->
