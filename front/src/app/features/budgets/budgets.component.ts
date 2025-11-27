@@ -13,16 +13,6 @@ import { BudgetItem } from '../../core/models/budget-item.model';
 import { SharedDataService } from '../../core/services/shared-data.service';
 import { AuthService } from '../../core/services/auth.service';
 
-/**
- * Componente principal de gestión de presupuestos.
- * 
- * Responsabilidades:
- * - Listar presupuestos
- * - Crear nuevos presupuestos
- * - Editar datos básicos (cliente, fecha)
- * - Eliminar presupuestos (solo ADMIN)
- * - Disparar navegación a historial y PDF
- */
 @Component({
   selector: 'app-budgets',
   standalone: true,
@@ -35,23 +25,22 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
   budgets: Budget[] = [];
   clients: Client[] = [];
 
-  /** Modelo para creación de nuevo presupuesto */
   newBudget: Budget = {
     clientId: 0,
     date: new Date().toISOString().split('T')[0],
     items: []
   };
 
-  /** Ítem en edición para agregar al nuevo presupuesto */
   newItem: BudgetItem = {
     description: '',
     quantity: 1,
     unitPrice: 0
   };
 
-  /** Edición de presupuesto existente */
+  // === MODAL EDICIÓN ===
+  showEditModal = false;
   editId: number | null = null;
-  editModel: Partial<Budget> = {};
+  editBudget: Partial<Budget> = { items: [] };
 
   constructor(
     private sharedData: SharedDataService,
@@ -65,13 +54,11 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
     this.loadClients();
     this.loadBudgets();
 
-    // Cargar ítems que vengan desde la Calculator
     const savedItems = this.sharedData.getItems();
     if (savedItems.length > 0) {
       this.newBudget.items.push(...savedItems);
     }
 
-    // Escuchar cambios en items compartidos
     this.sharedData.items$.subscribe(items => {
       if (items.length > 0) {
         this.newBudget.items = [...items];
@@ -80,109 +67,95 @@ export class BudgetsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Limpia ítems compartidos después de usar Calculator
     setTimeout(() => this.sharedData.clear(), 300);
   }
 
-  /** Carga presupuestos desde la API */
   loadBudgets(): void {
     this.budgetService.getAll().subscribe(res => this.budgets = res);
   }
 
-  /** Carga clientes desde la API */
   loadClients(): void {
     this.clientService.getAll().subscribe(res => this.clients = res);
   }
 
-  /** Agrega un ítem al nuevo presupuesto */
   addItem(): void {
     this.newBudget.items.push({ ...this.newItem });
     this.newItem = { description: '', quantity: 1, unitPrice: 0 };
   }
 
-  /** Elimina un ítem del nuevo presupuesto por índice */
   removeItem(i: number): void {
     this.newBudget.items.splice(i, 1);
   }
 
-  /** Crea un nuevo presupuesto */
   createBudget(): void {
-    if (!this.newBudget.clientId || this.newBudget.items.length === 0) {
-      alert('⚠️ Please select a client and add at least one item.');
-      return;
-    }
+    if (!this.newBudget.clientId || this.newBudget.items.length === 0) return;
 
-    this.budgetService.create(this.newBudget).subscribe({
-      next: () => {
-        alert('✅ Budget created successfully!');
-        this.newBudget = {
-          clientId: 0,
-          date: new Date().toISOString().split('T')[0],
-          items: []
-        };
-        this.loadBudgets();
-      },
-      error: err => {
-        console.error('Error creating budget:', err);
-        alert('❌ Error creating budget.');
-      }
+    this.budgetService.create(this.newBudget).subscribe(() => {
+      this.newBudget = {
+        clientId: 0,
+        date: new Date().toISOString().split('T')[0],
+        items: []
+      };
+      this.loadBudgets();
     });
   }
 
-  // === ADMIN: EDIT ===
+  // ===== MODAL EDICIÓN =====
 
-  startEdit(b: Budget): void {
+  openEditModal(b: Budget): void {
     if (!this.auth.isAdmin()) return;
+
     this.editId = b.id!;
-    this.editModel = { clientId: b.clientId, date: b.date };
+    this.editBudget = {
+      clientId: b.clientId,
+      date: b.date,
+      items: b.items.map(i => ({ ...i }))
+    };
+    this.showEditModal = true;
   }
 
-  cancelEdit(): void {
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editBudget = { items: [] };
     this.editId = null;
-    this.editModel = {};
   }
 
-  saveEdit(): void {
-    if (this.editId == null) return;
-
-    this.budgetService.update(this.editId, this.editModel).subscribe({
-      next: () => {
-        this.cancelEdit();
-        this.loadBudgets();
-      },
-      error: err => console.error('Error updating budget:', err)
+  addItemToEdit(): void {
+    this.editBudget.items!.push({
+      description: '',
+      quantity: 1,
+      unitPrice: 0
     });
   }
 
-  // === ADMIN: DELETE ===
+  removeItemFromEdit(i: number): void {
+    this.editBudget.items!.splice(i, 1);
+  }
+
+  saveBudgetFromModal(): void {
+    if (!this.editId) return;
+
+    this.budgetService.update(this.editId, this.editBudget).subscribe(() => {
+      this.closeEditModal();
+      this.loadBudgets();
+
+      // 🔄 regenerar PDF
+      this.budgetService.exportPdf(this.editId!).subscribe();
+    });
+  }
 
   deleteBudget(id: number): void {
     if (!this.auth.isAdmin()) return;
 
-    this.budgetService.delete(id).subscribe({
-      next: () => this.loadBudgets(),
-      error: err => console.error('Error deleting budget:', err)
-    });
+    this.budgetService.delete(id).subscribe(() => this.loadBudgets());
   }
 
-  /** Abre el PDF en una nueva pestaña */
   openPdfModal(budgetId: number): void {
-    this.budgetService.exportPdf(budgetId).subscribe({
-      error: err => {
-        console.error('Error loading PDF:', err);
-        alert('❌ Error loading PDF.');
-      }
-    });
+    this.budgetService.exportPdf(budgetId).subscribe();
   }
 
-  /**
-   * Navega a la pantalla de historial de un presupuesto.
-   * Solo se muestra para ADMIN en la UI.
-   */
   viewHistory(budgetId: number): void {
     if (!this.auth.isAdmin()) return;
     this.router.navigate(['/budgets', budgetId, 'history']);
   }
 }
-
-
