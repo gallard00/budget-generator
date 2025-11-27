@@ -4,28 +4,22 @@
 
   <!-- FORMULARIO DE CREACIÓN -->
   <form class="row g-2 mb-3" (ngSubmit)="createClient()">
-
     <div class="col-md-4">
       <input [(ngModel)]="newClient.name" name="name" class="form-control" placeholder="Name" />
     </div>
-
     <div class="col-md-4">
       <input [(ngModel)]="newClient.phone" name="phone" class="form-control" placeholder="Phone" />
     </div>
-
     <div class="col-md-4">
       <input [(ngModel)]="newClient.address" name="address" class="form-control" placeholder="Address" />
     </div>
-
     <div class="col-12 mt-2">
       <button class="btn btn-primary w-100">Add Client</button>
     </div>
-
   </form>
 
-  <!-- TABLA DE CLIENTES -->
+  <!-- TABLA -->
   <table class="table table-striped mt-3">
-
     <thead>
       <tr>
         <th>ID</th>
@@ -35,51 +29,44 @@
         <th *ngIf="auth.isAdmin()">Actions</th>
       </tr>
     </thead>
-
     <tbody>
       <tr *ngFor="let c of clients">
-
         <td>{{ c.id }}</td>
-
-        <!-- MODO EDICIÓN -->
-        <ng-container *ngIf="editId === c.id; else viewRow">
-
-          <td>
-            <input [(ngModel)]="editModel.name" name="e_name_{{c.id}}" class="form-control form-control-sm" />
-          </td>
-
-          <td>
-            <input [(ngModel)]="editModel.phone" name="e_phone_{{c.id}}" class="form-control form-control-sm" />
-          </td>
-
-          <td>
-            <input [(ngModel)]="editModel.address" name="e_addr_{{c.id}}" class="form-control form-control-sm" />
-          </td>
-
-          <td *ngIf="auth.isAdmin()">
-            <button class="btn btn-sm btn-success me-1" (click)="saveEdit()">Save</button>
-            <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Cancel</button>
-          </td>
-
-        </ng-container>
-
-        <!-- VISTA NORMAL -->
-        <ng-template #viewRow>
-
-          <td>{{ c.name }}</td>
-          <td>{{ c.phone }}</td>
-          <td>{{ c.address }}</td>
-
-          <td *ngIf="auth.isAdmin()">
-            <button class="btn btn-sm btn-warning me-1" (click)="startEdit(c)">Edit</button>
-            <button class="btn btn-sm btn-danger" (click)="deleteClient(c.id)">Delete</button>
-          </td>
-
-        </ng-template>
-
+        <td>{{ c.name }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.address }}</td>
+        <td *ngIf="auth.isAdmin()">
+          <button class="btn btn-sm btn-warning me-1" (click)="openEditModal(c)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteClient(c.id)">Delete</button>
+        </td>
       </tr>
     </tbody>
-
   </table>
+</div>
 
+<!-- ========= MODAL EDICIÓN CLIENT ========= -->
+<div class="modal-backdrop" *ngIf="showEditModal"></div>
+
+<div class="modal d-block" *ngIf="showEditModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5>Edit Client</h5>
+        <button class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <input class="form-control mb-2" [(ngModel)]="editModel.name" placeholder="Name">
+        <input class="form-control mb-2" [(ngModel)]="editModel.phone" placeholder="Phone">
+        <input class="form-control mb-2" [(ngModel)]="editModel.address" placeholder="Address">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEditModal()">Cancel</button>
+        <button class="btn btn-success" (click)="saveFromModal()">Save</button>
+      </div>
+
+    </div>
+  </div>
 </div>
