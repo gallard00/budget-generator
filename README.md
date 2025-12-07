@@ -10,180 +10,231 @@
 
 ---
 
-## 📸 Vista previa
+📸 Vista previa
 
-| Módulo Clientes | Módulo Presupuestos | Módulo Calculadora |
-|-----------------|----------------------|--------------------|
-| ![Clients](https://github.com/gallard00/budget-generator/assets/preview_clients.png) | ![Budgets](https://github.com/gallard00/budget-generator/assets/preview_budgets.png) | ![Calculator](https://github.com/gallard00/budget-generator/assets/preview_calculator.png) |
+🎯 Módulos principales:
 
----
+Clientes
 
-## 🧩 Descripción general
+Presupuestos
 
-**Budget Generator** es una aplicación **Full Stack (Spring Boot + Angular)** que permite:
-- Registrar y administrar clientes.
-- Crear presupuestos con ítems detallados.
-- Calcular automáticamente totales y exportar a PDF.
-- Usar una **calculadora de materiales** para agregar ítems según superficie y tipo de material.
+Calculadora de Materiales
 
-💡 Diseñado con una arquitectura profesional, aplicando principios **SOLID**, patrones **Repository** y **Strategy**, e integración completa **REST** entre backend y frontend.
+Historial de Presupuestos
 
----
+Exportación a PDF
 
-## ⚙️ Tecnologías utilizadas
+🧩 Descripción general
 
-### 🖥️ Backend
-- **Java 17**
-- **Spring Boot 3.x**
-- **Spring Data JPA**
-- **MariaDB**
-- **ModelMapper**
-- **Lombok**
-- **Swagger UI**
-- **Docker Compose**
+Budget Generator es una aplicación Full Stack profesional desarrollada con Spring Boot y Angular, destinada a la gestión integral de presupuestos para obras y trabajos de construcción.
 
-### 🌐 Frontend
-- **Angular 20 (standalone components)**
-- **Bootstrap 5**
-- **Axios**
-- **RxJS**
-- **TypeScript**
-- **HTML / SCSS**
+Permite:
 
----
+Registrar y administrar clientes.
 
-## 🧠 Arquitectura
+Crear presupuestos con ítems detallados.
 
+Calcular automáticamente totales.
+
+Exportar presupuestos en PDF.
+
+Usar una calculadora de materiales vinculada directamente a los presupuestos.
+
+Mantener un historial de modificaciones por cada presupuesto.
+
+Gestionar roles de usuario (ADMIN / USER) mediante JWT.
+
+💡 El proyecto está diseñado bajo una arquitectura limpia, aplicando principios SOLID, patrones de diseño y comunicación REST entre backend y frontend.
+
+⚙️ Tecnologías utilizadas
+🖥️ Backend
+
+Java 17
+
+Spring Boot 3.x
+
+Spring Security + JWT
+
+Spring Data JPA
+
+MariaDB
+
+Lombok
+
+Swagger UI
+
+Docker Compose
+
+🌐 Frontend
+
+Angular 20 (Standalone Components)
+
+Bootstrap 5
+
+RxJS
+
+TypeScript
+
+HTML / SCSS
+
+🧠 Arquitectura del proyecto
 back/
 ├── controller/
-│ ├── BudgetController.java
-│ ├── ClientController.java
-│ └── CalculationController.java
+│   ├── AuthController.java
+│   ├── BudgetController.java
+│   ├── ClientController.java
+│   └── CalculationController.java
+│
 ├── model/
-│ ├── Budget.java
-│ ├── Client.java
-│ ├── Item.java
-│ ├── CalculationInput.java
-│ ├── CalculationResult.java
-│ └── MaterialType.java
+│   ├── Budget.java
+│   ├── BudgetItem.java
+│   ├── BudgetHistory.java
+│   ├── Client.java
+│   ├── snapshot/
+│   │   ├── BudgetSnapshot.java
+│   │   └── BudgetItemSnapshot.java
+│
 ├── repository/
-│ ├── BudgetRepository.java
-│ └── ClientRepository.java
+│   ├── BudgetRepository.java
+│   ├── BudgetHistoryRepository.java
+│   └── ClientRepository.java
+│
 ├── service/
-│ ├── ICalculationService.java
-│ └── impl/CalculationServiceImpl.java
-├── strategy/
-│ ├── IFileExporter.java
-│ ├── PDFExporter.java
-│ └── WordExporter.java
-└── BudgetGeneratorApplication.java
+│   ├── IBudgetService.java
+│   └── impl/
+│       └── BudgetServiceImpl.java
+│
+└── security/
+    ├── JwtUtil.java
+    ├── JwtAuthenticationFilter.java
+    └── SecurityConfig.java
 
 front/
 ├── core/
-│ ├── models/
-│ ├── services/
-│ └── pipes/
+│   ├── models/
+│   ├── services/
+│   ├── guards/
+│   └── pipes/
+│
 ├── features/
-│ ├── clients/
-│ ├── budgets/
-│ └── calculator/
+│   ├── clients/
+│   ├── budgets/
+│   ├── calculator/
+│   └── auth/
+│
 └── app.routes.ts
 
-yaml
-Copiar código
+🧾 Módulos principales
+👤 Clientes
 
----
+Crear, listar, editar y eliminar clientes.
 
-## 🧾 Módulos principales
+Seguridad por ROL ADMIN.
 
-### 👤 Clientes
-- Crear, listar y eliminar clientes.
-- Relación 1:N con presupuestos.
-- Eliminación en cascada.
+Relación 1 a N con presupuestos.
 
-### 💰 Presupuestos
-- Crear presupuestos con fecha, cliente e ítems.
-- Calcular el total automáticamente.
-- Exportar presupuesto en formato **PDF**.
+💰 Presupuestos
 
-### 🧮 Calculadora de materiales
-- Calcular superficie (ancho × alto).
-- Seleccionar tipo de material y calcular costo total.
-- Enviar los ítems calculados directamente al presupuesto activo.
+Crear presupuestos con:
 
----
+Fecha
 
-## 🧱 Patrones y principios aplicados
+Cliente
 
-| Patrón / Principio | Implementación |
-|--------------------|----------------|
-| **SOLID** | Separación en capas: Controller, Service, Repository, DTO. |
-| **Repository Pattern** | `IBudgetRepository` / `MariaDBBudgetRepository`. |
-| **Strategy Pattern** | `IFileExporter` con implementaciones `PDFExporter` y `WordExporter`. |
-| **Dependency Inversion** | `Budget` depende de abstracciones. |
-| **DTO Layer** | Comunicación limpia entre API y Frontend. |
-| **Observable Sharing** | `SharedDataService` entre componentes Angular. |
+Ítems
 
----
+Cálculo automático del total.
 
-## 📊 Diagrama UML (simplificado)
+Edición completa mediante modal:
 
-Client 1 ────◆───* Budget ◇───* Item
-Budget ──> IFileExporter ──> PDFExporter | WordExporter
-Budget ──> IBudgetRepository ──> MariaDBBudgetRepository
-Calculator ──> SharedDataService ──> Budgets
+Cliente
 
-yaml
-Copiar código
+Fecha
 
----
+Ítems (agregar / editar / eliminar)
 
-## 🐳 Ejecución con Docker
+Exportación automática a PDF.
 
-```bash
+Historial de modificaciones (Budget History).
+
+Seguridad por JWT + Roles.
+
+🧮 Calculadora de materiales
+
+Calcular superficie: ancho × alto
+
+Seleccionar tipo de material.
+
+Enviar ítems directamente al presupuesto.
+
+Integración con SharedDataService.
+
+🧱 Patrones y principios aplicados
+Principio / Patrón	Aplicación
+SOLID	Separación en capas: Controller, Service, Repository, DTO
+Repository Pattern	Interfaces JPA para persistencia
+Strategy Pattern	Exportadores de archivos (PDF, extensible)
+Dependency Inversion (DIP)	Servicios dependen de interfaces
+DTO Pattern	Comunicación limpia API ↔ Frontend
+JWT Authentication	Seguridad por token
+Role-Based Access Control	ADMIN / USER
+State Sharing (Angular)	SharedDataService
+🐳 Ejecución con Docker
 docker-compose up --build
-```
-Esto levanta:
 
--Backend Spring Boot en http://localhost:8080
 
--Base de datos MariaDB
+Se levantan automáticamente:
 
--Frontend Angular en http://localhost:4200
+Backend: http://localhost:8080
 
----
+Base de datos: MariaDB
 
-## ⚙️ Ejecución manual
-**Backend**
-```
-bash
+Frontend: http://localhost:4200
+
+⚙️ Ejecución manual
+▶ Backend
 cd back
 mvn spring-boot:run
-```
-**Frontend**
-```
-bash
+
+▶ Frontend
 cd front
 npm install
 ng serve --open
-```
----
 
-## 📡 API Endpoints
-**Método**	**Endpoint**	**Descripción**
-GET	/api/clients	Listar clientes
-POST	/api/clients	Crear cliente
-DELETE	/api/clients/{id}	Eliminar cliente
-GET	/api/budgets	Listar presupuestos
-POST	/api/budgets	Crear presupuesto
-GET	/api/export/pdf/{id}	Exportar presupuesto a PDF
-POST	/api/calc	Calcular materiales
+📡 API Endpoints principales
+🔐 Autenticación
 
----
+POST /api/auth/login
 
-## 🧩 Ejemplo de presupuesto
-```
-json
+POST /api/auth/register
+
+👤 Clientes
+
+GET /api/clients
+
+POST /api/clients
+
+PUT /api/clients/{id}
+
+DELETE /api/clients/{id}
+
+💰 Presupuestos
+
+GET /api/budgets
+
+POST /api/budgets
+
+PUT /api/budgets/{id}
+
+DELETE /api/budgets/{id}
+
+GET /api/budgets/{id}/history
+
+📄 Exportación
+
+GET /api/export/pdf/{id}
+
+🧩 Ejemplo de creación de presupuesto
 {
   "clientId": 1,
   "date": "2025-10-21",
@@ -193,41 +244,51 @@ json
   ]
 }
 
-```
-
----
-
-## 🧮 Ejemplo de cálculo (módulo Calculator)
-```
-json
+🧮 Ejemplo de uso de la Calculadora
 {
   "width": 5.2,
   "height": 2.0,
   "materialType": "PORCELANATO"
 }
-```
-**Respuesta:**
-```
-json
+
+
+Respuesta:
+
 {
   "squareMeters": 10.4,
   "totalPrice": 83200
 }
-```
----
 
-## 👨‍💻 Autor
-**Nahuel Gallardo**
-Analista en Programación y Desarrollo de Aplicaciones
+👨‍💻 Autor
+
+Nahuel Gallardo
 📍 Miramar, Buenos Aires, Argentina
+🎓 Analista en Programación y Desarrollo de Aplicaciones
 📧 gallardonahuel293@gmail.com
-🔗 [LinkedIn](https://www.linkedin.com/in/nahuelgallard00/)
-🐙 [GitHub](https://github.com/gallard00)
 
----
+🔗 LinkedIn: agregás tu link
+🐙 GitHub: https://github.com/gallard00
 
 ⭐ Contribución
-Si querés proponer mejoras o reportar bugs, abrí un Issue o hacé un Pull Request.
-¡Las sugerencias son siempre bienvenidas!
 
-Desarrollado con ❤️ por Nahuel Gallardo — Proyecto académico y profesional.
+Si querés proponer mejoras o reportar bugs:
+
+Abrí un Issue
+
+Enviá un Pull Request
+
+Toda colaboración es bienvenida 🤝
+
+🏁 Estado del Proyecto
+
+✅ Arquitectura profesional
+✅ Seguridad por JWT
+✅ Historial de presupuestos
+✅ Edición completa con modales
+✅ Exportación a PDF
+✅ Principios SOLID aplicados
+✅ Listo para defensa académica
+
+💙 Desarrollado con dedicación por Nahuel Gallardo
+
+Proyecto académico y profesional — POO 3 / Full Stack
